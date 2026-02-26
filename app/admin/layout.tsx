@@ -45,7 +45,7 @@ background:"linear-gradient(180deg,#020617,#000)"
 
 <div style={{
 width:"300px",
-background: "var(--bg)",
+background: "#080808",
 color:"black",
 boxShadow:"20px 0 60px rgba(0,0,0,.8)",
 padding:"30px",

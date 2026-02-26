@@ -4,51 +4,49 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useCart } from "./context/CartContext";
-import { Product } from "@/types/Product";
 import Link from "next/link";
+
+/* ✅ TEMP FIX (remove import error) */
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  images?: string[];
+  category?: string;
+  featured?: boolean;
+  sizes?: Record<string, number>;
+};
 
 export default function Home(){
 
 const [products,setProducts] = useState<Product[]>([]);
 const [selectedCategory,setSelectedCategory] = useState("featured");
+
+const [popupProduct,setPopupProduct] = useState<Product | null>(null);
+const [selectedSize,setSelectedSize] = useState<string | null>(null);
+
 const {addToCart} = useCart();
 
 /* ================= FETCH ================= */
 
 useEffect(()=>{
-
 async function fetchProducts(){
-
 const snapshot = await getDocs(collection(db,"products"));
-
 const list = snapshot.docs.map(doc=>({
 id:doc.id,
 ...doc.data()
 })) as Product[];
-
 setProducts(list);
 }
-
 fetchProducts();
-
 },[]);
-
 
 /* ================= FILTER ================= */
 
 const filtered = products.filter(product=>{
-
-// ⭐ FEATURED DEFAULT
-if(selectedCategory === "featured"){
-return product.featured === true;
-}
-
+if(selectedCategory === "featured") return product.featured === true;
 return product.category === selectedCategory;
-
 });
-
-
-/* ================= UI ================= */
 
 return(
 
@@ -72,11 +70,10 @@ overflow:"hidden"
 <img
 src="/images/hero.png"
 style={{
-position:"absolute",
 width:"100%",
 height:"100%",
-objectFit:"cover",
-filter:"brightness(.35)"
+objectFit:"cover",   // ✅ FIXED (no cropping issue now)
+filter:"brightness(.4)"
 }}
 />
 
@@ -84,93 +81,74 @@ filter:"brightness(.35)"
 position:"absolute",
 width:"100%",
 height:"100%",
-background:`
-radial-gradient(circle at 20% 30%, rgba(255,120,0,.35), transparent 40%),
-radial-gradient(circle at 80% 70%, rgba(255,60,0,.25), transparent 40%)
-`
+background:"linear-gradient(to bottom, rgba(0,0,0,0.2), #000)"
 }}/>
 
 <div style={{
-position:"relative",
-height:"100%",
-display:"flex",
-flexDirection:"column",
-justifyContent:"center",
-alignItems:"center",
-textAlign:"center"
+position:"absolute",
+top:"50%",
+left:"50%",
+transform:"translate(-50%,-50%)",
+textAlign:"center",
+padding:"0 20px"
 }}>
 
 <h1 style={{
-fontSize:"clamp(56px,9vw,140px)",
+fontSize:"clamp(32px,8vw,120px)",   // ✅ MOBILE FIX
 fontWeight:900,
-letterSpacing:"-3px",
-background:"linear-gradient(90deg,#ff7a00,#ff2d00)",
+letterSpacing:"-2px",
+background:"linear-gradient(90deg,#ff7a00,#ffffff)",
 WebkitBackgroundClip:"text",
 color:"transparent",
-textShadow:"0 20px 80px rgba(255,120,0,.5)"
+whiteSpace:"nowrap"   // ✅ FORCE 1 LINE
 }}>
 MAD BALLERS
 </h1>
 
 <p style={{
-color:"#ddd",
-fontSize:"22px",
-marginTop:"10px"
+color:"#ccc",
+fontSize:"clamp(14px,3vw,20px)"
 }}>
-India’s Most Aggressive Football Store
+Premium Football Store
 </p>
 
 </div>
 </div>
 
 
-{/* ================= PRODUCTS LAYER ================= */}
+{/* ================= PRODUCTS ================= */}
 
 <div style={{
-position:"relative",
 marginTop:"100vh",
-background:"rgba(5,5,5,.85)",
-backdropFilter:"blur(30px)",
-borderTopLeftRadius:"50px",
-borderTopRightRadius:"50px",
-padding:"80px 40px",
-boxShadow:"0 -40px 120px rgba(0,0,0,.9)"
+background:"#050505",
+borderTopLeftRadius:"40px",
+borderTopRightRadius:"40px",
+padding:"50px 20px"
 }}>
 
-{/* ================= CATEGORY ================= */}
+
+{/* CATEGORY */}
 
 <div style={{
 display:"flex",
-gap:"14px",
+gap:"10px",
 overflowX:"auto",
-paddingBottom:"20px",
-marginBottom:"40px"
+marginBottom:"30px"
 }}>
 
 {["featured","boots","jerseys","gloves","jackets","balls","gear"].map(cat=>(
 
 <button
-key={cat}   // ⭐⭐⭐ FIXES YOUR ERROR
+key={cat}
 onClick={()=>setSelectedCategory(cat)}
 style={{
-padding:"12px 26px",
+padding:"10px 18px",
 borderRadius:"999px",
-border:selectedCategory===cat
-? "1px solid #ff7a00"
-: "1px solid rgba(255,255,255,.08)",
-
-background:selectedCategory===cat
-? "linear-gradient(90deg,#ff7a00,#ffb347)"
-: "rgba(255,255,255,.03)",
-
-color:selectedCategory===cat
-? "#000"
-: "#ddd",
-
-fontWeight:"800",
-letterSpacing:".5px",
-cursor:"pointer",
-transition:"0.25s"
+border:"1px solid #222",
+background:selectedCategory===cat ? "#ff7a00" : "#111",
+color:selectedCategory===cat ? "#000" : "#aaa",
+fontWeight:"700",
+whiteSpace:"nowrap"
 }}
 >
 {cat.toUpperCase()}
@@ -181,35 +159,39 @@ transition:"0.25s"
 </div>
 
 
-
-{/* ================= PRODUCT GRID ================= */}
+{/* PRODUCT GRID */}
 
 <div style={{
 display:"grid",
-gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",
-gap:"34px"
+gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",  // ✅ MOBILE FIX
+gap:"16px"
 }}>
 
 {filtered.map(product=>(
 
 <div
-key={product.id}   // ⭐ ALSO IMPORTANT
+key={product.id}
 style={{
-background:"linear-gradient(145deg,#0a0a0a,#050505)",
-padding:"24px",
-borderRadius:"26px",
-border:"1px solid rgba(255,120,0,.15)",
-transition:"0.45s",
-cursor:"pointer"
+background:"#0a0a0a",
+padding:"14px",
+borderRadius:"16px",
+border:"1px solid #111",
+transition:"0.3s"
+}}
+onMouseEnter={(e)=>{
+e.currentTarget.style.transform="translateY(-6px)";
+}}
+onMouseLeave={(e)=>{
+e.currentTarget.style.transform="translateY(0)";
 }}
 >
 
 <Link href={`/product/${product.id}`}>
 <img
-src={product.images?.[0]}
+src={product.images?.[0] || "/placeholder.png"}
 style={{
 width:"100%",
-height:"230px",
+height:"140px",   // ✅ MOBILE FIX
 objectFit:"contain"
 }}
 />
@@ -217,51 +199,40 @@ objectFit:"contain"
 
 <h3 style={{
 color:"white",
-marginTop:"16px",
-fontSize:"20px"
+fontSize:"14px",
+marginTop:"10px"
 }}>
 {product.name}
 </h3>
 
 <p style={{
 color:"#ff7a00",
-fontWeight:"900",
-fontSize:"20px"
+fontWeight:"800",
+fontSize:"14px"
 }}>
 ₹{product.price}
 </p>
 
+
+{/* ✅ FIXED SIZE FLOW */}
+
 <button
 onClick={()=>{
-
-// ⭐ FORCE SIZE CHECK
-if(!product.sizes){
-alert("Select size on product page");
-return;
-}
-
-addToCart({
-id:product.id,
-name:product.name,
-price:product.price,
-image:product.images?.[0] || "",
-size:Object.keys(product.sizes)[0] // fallback
-});
-
+setPopupProduct(product);
+setSelectedSize(null);
 }}
 style={{
-marginTop:"14px",
+marginTop:"8px",
 width:"100%",
-padding:"14px",
-borderRadius:"12px",
+padding:"10px",
+borderRadius:"10px",
 border:"none",
-background:"linear-gradient(90deg,#ff7a00,#ffb347)",
+background:"#ff7a00",
 color:"#000",
-fontWeight:"900",
-cursor:"pointer"
+fontWeight:"800"
 }}
 >
-Add To Cart
+Add
 </button>
 
 </div>
@@ -271,6 +242,125 @@ Add To Cart
 </div>
 
 </div>
+
+
+{/* ================= SIZE POPUP ================= */}
+
+{popupProduct && (
+
+<div
+onClick={()=>setPopupProduct(null)}
+style={{
+position:"fixed",
+top:0,
+left:0,
+width:"100%",
+height:"100%",
+background:"rgba(0,0,0,.9)",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+zIndex:9999
+}}
+>
+
+<div
+onClick={(e)=>e.stopPropagation()}
+style={{
+background:"#050505",
+padding:"25px",
+borderRadius:"20px",
+width:"90%",
+maxWidth:"400px"
+}}
+>
+
+<img
+src={popupProduct.images?.[0]}
+style={{width:"100%"}}
+/>
+
+<h2 style={{color:"white"}}>
+{popupProduct.name}
+</h2>
+
+<p style={{color:"#ff7a00"}}>
+₹{popupProduct.price}
+</p>
+
+
+{/* SIZES */}
+
+<div style={{
+display:"flex",
+flexWrap:"wrap",
+gap:"10px",
+margin:"15px 0"
+}}>
+
+{Object.entries(popupProduct.sizes || {}).map(([size,stock])=>{
+
+const out = Number(stock)<=0;
+
+return(
+
+<button
+key={size}
+disabled={out}
+onClick={()=>setSelectedSize(size)}
+style={{
+width:"44px",
+height:"44px",
+borderRadius:"50%",
+border:selectedSize===size
+? "2px solid #ff7a00"
+: "1px solid #333",
+background: out ? "#111" : "#000",
+color: out ? "#555" : "white",
+opacity: out ? 0.4 : 1
+}}
+>
+{size}
+</button>
+
+);
+
+})}
+
+</div>
+
+
+<button
+disabled={!selectedSize}
+onClick={()=>{
+
+addToCart({
+id:popupProduct.id,
+name:popupProduct.name,
+price:popupProduct.price,
+image:popupProduct.images?.[0] || "",
+size:selectedSize!
+});
+
+setPopupProduct(null);
+
+}}
+style={{
+width:"100%",
+padding:"14px",
+background:selectedSize ? "#ff7a00" : "#222",
+border:"none",
+borderRadius:"10px",
+fontWeight:"900"
+}}
+>
+Add To Cart
+</button>
+
+</div>
+</div>
+
+)}
 
 </div>
 );

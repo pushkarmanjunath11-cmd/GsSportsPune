@@ -10,6 +10,27 @@ updateDoc,
 getDoc
 } from "firebase/firestore";
 
+async function reduceStock(order:any){
+
+for(const item of order.items){
+
+const ref = doc(db,"products",item.id);
+const snap = await getDoc(ref);
+
+if(!snap.exists()) continue;
+
+const data = snap.data();
+
+const sizes = {...data.sizes};
+
+sizes[item.size] -= 1;
+
+await updateDoc(ref,{sizes});
+
+}
+
+}
+
 export default function OrdersPage(){
 
 const [orders,setOrders] = useState<any[]>([]);
@@ -129,6 +150,11 @@ marginTop:"10px"
 <option>Delivered</option>
 </select>
 
+<button onClick={()=>{
+reduceStock(order);
+}}>
+Confirm Order
+</button>
 
 <div style={{marginTop:"15px"}}>
 

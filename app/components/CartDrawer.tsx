@@ -71,9 +71,9 @@ cursor:"pointer"
 
 {cart.length === 0 && <p>Your cart is empty</p>}
 
-{cart.map(item=>(
+{cart.map((item, index) => (
 
-<div key={item.id+item.size} style={{
+<div key={`${item.id}-${item.size}-${index}`} style={{
 display:"flex",
 gap:"10px",
 marginBottom:"18px"

@@ -13,6 +13,7 @@ const [product,setProduct] = useState<any>(null);
 const [selectedSize,setSelectedSize] = useState<string | null>(null);
 const [currentImage, setCurrentImage] = useState(0);
 const intervalRef = useRef<NodeJS.Timeout | null>(null);
+const [fullscreen,setFullscreen] = useState(false);
 const startInterval = () => {
 
 if(intervalRef.current) return;
@@ -73,15 +74,19 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, [product]);
 
-useEffect(()=>{
+useEffect(() => {
 
-if(product?.images?.length > 1){
-startInterval();
-}
+if (!product?.images?.length) return;
+if (fullscreen) return; // ⭐ STOP when fullscreen
 
-return stopInterval;
+const interval = setInterval(() => {
+setCurrentImage(prev =>
+prev === product.images.length - 1 ? 0 : prev + 1
+);
+}, 2500);
+return () => clearInterval(interval);
 
-},[product]);
+}, [product, fullscreen]);
 
 if(!product){
 
@@ -121,15 +126,38 @@ alignItems:"center"
 
 {/* IMAGE */}
 
+<div
+style={{
+overflow:"hidden",
+borderRadius:"24px",
+cursor:"zoom-in"
+}}
+onClick={()=>{
+setFullscreen(true);
+stopInterval(); // stops auto slide
+}}
+>
+
 <img
-  src={product?.images?.[currentImage] || product?.images?.[0]}
-  style={{
-    width: "100%",
-    height: "520px",
-    objectFit: "contain",
-    transition: "all 1.2s cubic-bezier(.22,1,.36,1)"
-  }}
+src={product?.images?.[currentImage]}
+onClick={() => setFullscreen(true)}
+style={{
+width:"100%",
+height:"520px",
+objectFit:"contain",
+transition:"0.4s",
+cursor:"zoom-in"
+}}
+onMouseEnter={(e)=>{
+e.currentTarget.style.transform="scale(1.05)";
+}}
+onMouseLeave={(e)=>{
+e.currentTarget.style.transform="scale(1)";
+}}
 />
+
+</div>
+
 
 <div
 onMouseEnter={stopInterval}
@@ -149,7 +177,7 @@ fontWeight:"900"
 </h1>
 
 <p style={{
-color:"#ff7a00",
+color:"#ffffff",
 fontSize:"28px",
 fontWeight:"900"
 }}>
@@ -186,13 +214,13 @@ padding:"14px 18px",
 borderRadius:"14px",
 
 border:selectedSize === size
-? "2px solid #ff7a00"
+? "2px solid #ffffff"
 : out
 ? "1px solid #333"
-: "1px solid tgba(255,255,255,.15)",
+: "1px solid rgba(255,255,255,.15)",
 
 background:selectedSize === size
-? "linear-gradient(90deg,#ff7a00,#ffb347)"
+? "linear-gradient(90deg,#ffffff,#bdbdc6)"
 : out
 ? "#0a0a0a"
 : "#111",
@@ -256,9 +284,7 @@ width:"100%",
 padding:"18px",
 borderRadius:"16px",
 border:"none",
-background:selectedSize
-? "linear-gradient(90deg,#ff7a00,#ffb347)"
-: "#222",
+background:"#ffffff",
 color:"#000",
 fontWeight:"900",
 fontSize:"18px",
@@ -272,6 +298,83 @@ Add To Cart
 </div>
 
 </div>
+
+{fullscreen && (
+
+<div
+onClick={()=>{
+setFullscreen(false);
+startInterval(); // resume autoslide
+}}
+style={{
+position:"fixed",
+top:0,
+left:0,
+width:"100vw",
+height:"100vh",
+background:"rgba(0,0,0,.96)",
+display:"flex",
+justifyContent:"center",
+alignItems:"center",
+zIndex:99999
+}}
+>
+
+{/* PREV */}
+<button
+onClick={(e)=>{
+e.stopPropagation();
+setCurrentImage(prev =>
+prev === 0 ? product.images.length-1 : prev-1
+);
+}}
+style={{
+position:"absolute",
+left:"40px",
+fontSize:"40px",
+background:"none",
+border:"none",
+color:"white",
+cursor:"pointer"
+}}
+>
+‹
+</button>
+
+
+<img
+src={product.images[currentImage]}
+style={{
+maxWidth:"85%",
+maxHeight:"85%",
+objectFit:"contain"
+}}
+/>
+
+
+{/* NEXT */}
+<button
+onClick={(e)=>{
+e.stopPropagation();
+setCurrentImage(prev =>
+prev === product.images.length-1 ? 0 : prev+1
+);
+}}
+style={{
+position:"absolute",
+right:"40px",
+fontSize:"40px",
+background:"none",
+border:"none",
+color:"white",
+cursor:"pointer"
+}}
+>
+›
+</button>
+
+</div>
+)}
 
 </div>
 );

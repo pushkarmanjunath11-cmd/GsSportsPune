@@ -74,7 +74,7 @@ textDecoration:"none"
 }}
 >
 <span style={{
-background:"linear-gradient(90deg,#ff7a00,#ffb347)",
+background:"linear-gradient(90deg,#ffffff,#9ca3af)",
 WebkitBackgroundClip:"text",
 color:"transparent"
 }}>
@@ -112,8 +112,8 @@ style={{
 padding:"10px 18px",
 borderRadius:"14px",
 border:"1px solid rgba(255,255,255,.08)",
-background:"linear-gradient(90deg,#ff7a00,#ffb347)",
-color:"var(--bg)",
+background:"#ffffff",
+color:"#000",
 fontWeight:"800",
 cursor:"pointer",
 transition:"0.3s"
