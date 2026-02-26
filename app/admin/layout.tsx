@@ -57,8 +57,10 @@ backdropFilter:"blur(20px)"
 fontSize:"28px",
 fontWeight:"900",
 letterSpacing:"1px",
+marginTop:"80px",
 marginBottom:"40px",
-color:"linear-gradient(90deg,#ff7a00,#ffb347)"
+color:"White",
+textAlign:"center"
 }}>
 ⚡ Boots Vault Admin
 </h1>
@@ -77,10 +79,6 @@ Orders
 
 <Link href="/admin/products" style={nav("/admin/products")}>
 Products
-</Link>
-
-<Link href="/admin/analytics" style={nav("/admin/analytics")}>
-Analytics
 </Link>
 
 </div>

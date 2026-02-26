@@ -131,9 +131,10 @@ padding:"50px 20px"
 
 <div style={{
 display:"flex",
-gap:"10px",
-overflowX:"auto",
-marginBottom:"30px"
+gap:"12px",
+gridTemplateColumns:"repeat(auto-fit, minmax(120px,1fr))",
+marginBottom:"40px",
+width:"100%"
 }}>
 
 {["featured","boots","jerseys","gloves","jackets","balls","gear"].map(cat=>(
@@ -148,7 +149,9 @@ border:"1px solid #222",
 background:selectedCategory===cat ? "#ff7a00" : "#111",
 color:selectedCategory===cat ? "#000" : "#aaa",
 fontWeight:"700",
-whiteSpace:"nowrap"
+whiteSpace:"nowrap",
+width:"100%",
+textAlign:"center"
 }}
 >
 {cat.toUpperCase()}
@@ -158,13 +161,13 @@ whiteSpace:"nowrap"
 
 </div>
 
-
 {/* PRODUCT GRID */}
 
 <div style={{
-display:"grid",
-gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",  // ✅ MOBILE FIX
-gap:"16px"
+width: "100%",
+display: "grid",
+gridTemplateColumns: "repeat(5, minmax(0, 1fr))", // 🔥 FORCE 5 FULL WIDTH
+gap: "20px"
 }}>
 
 {filtered.map(product=>(
@@ -172,11 +175,15 @@ gap:"16px"
 <div
 key={product.id}
 style={{
+width: "100%", // 🔥 IMPORTANT
 background:"#0a0a0a",
 padding:"14px",
 borderRadius:"16px",
 border:"1px solid #111",
-transition:"0.3s"
+transition:"0.3s",
+display:"flex",
+flexDirection:"column",
+justifyContent:"space-between" // 🔥 FILL HEIGHT
 }}
 onMouseEnter={(e)=>{
 e.currentTarget.style.transform="translateY(-6px)";
@@ -187,20 +194,23 @@ e.currentTarget.style.transform="translateY(0)";
 >
 
 <Link href={`/product/${product.id}`}>
+
 <img
 src={product.images?.[0] || "/placeholder.png"}
 style={{
 width:"100%",
-height:"140px",   // ✅ MOBILE FIX
+height:"180px",
 objectFit:"contain"
 }}
 />
+
 </Link>
 
 <h3 style={{
 color:"white",
 fontSize:"14px",
-marginTop:"10px"
+marginTop:"10px",
+flexGrow:1 // 🔥 PUSH BUTTON DOWN
 }}>
 {product.name}
 </h3>
@@ -212,9 +222,6 @@ fontSize:"14px"
 }}>
 ₹{product.price}
 </p>
-
-
-{/* ✅ FIXED SIZE FLOW */}
 
 <button
 onClick={()=>{
@@ -242,7 +249,6 @@ Add
 </div>
 
 </div>
-
 
 {/* ================= SIZE POPUP ================= */}
 
