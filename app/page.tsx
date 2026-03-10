@@ -95,9 +95,9 @@ export default function Home() {
             whiteSpace: "nowrap",
             lineHeight: 1
           }}>
-            GS SPORTS PUNE
+            
           </h1>
-          <p style={{ color: "#ccc", fontSize: "clamp(13px, 3vw, 20px)", marginTop: "12px" }}>
+          <p style={{ color: "#ccc", fontSize: "clamp(13px, 3vw, 20px)", marginTop: "300px", marginLeft: "150px" }}>
             Jerseys | Cleats | Accessories — Pan-India Shipping 🌍
           </p>
         </div>
