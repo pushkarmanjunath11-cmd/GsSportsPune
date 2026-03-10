@@ -62,43 +62,51 @@ export default function Home() {
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            filter: "brightness(.4)",
+            objectPosition: "center center",  // ✅ always centered
+            filter: "brightness(.35)",
             display: "block"
           }}
         />
 
-        {/* gradient fade to black at bottom */}
+        {/* bottom fade */}
         <div style={{
           position: "absolute",
           bottom: 0, left: 0,
           width: "100%",
-          height: "40%",
+          height: "50%",
           background: "linear-gradient(to bottom, transparent, #000)"
         }} />
 
-        {/* hero text */}
+        {/* hero text — centered, wraps properly on mobile */}
         <div style={{
           position: "absolute",
           top: "50%", left: "50%",
           transform: "translate(-50%,-50%)",
           textAlign: "center",
-          width: "100%",
-          padding: "0 20px"
+          width: "90%",          // ✅ constrained width so text doesn't overflow
+          maxWidth: "700px"
         }}>
           <h1 style={{
-            fontSize: "clamp(40px, 12vw, 120px)",
+            fontSize: "clamp(32px, 10vw, 100px)",
             fontWeight: 900,
-            letterSpacing: "-2px",
+            letterSpacing: "-1px",
             background: "linear-gradient(90deg,#2563eb,#ffffff)",
             WebkitBackgroundClip: "text",
             color: "transparent",
-            whiteSpace: "nowrap",
-            lineHeight: 1
+            lineHeight: 1.1,
+            whiteSpace: "normal",   // ✅ allow wrapping on small screens
+            wordBreak: "break-word"
           }}>
-            
+            GS SPORTS PUNE
           </h1>
-          <p style={{ color: "#ccc", fontSize: "clamp(13px, 3vw, 20px)", marginTop: "300px", marginLeft: "150px" }}>
-            Jerseys | Cleats | Accessories — Pan-India Shipping 🌍
+          <p style={{
+            color: "#ccc",
+            fontSize: "clamp(12px, 3vw, 18px)",
+            marginTop: "14px",
+            lineHeight: 1.6
+          }}>
+            Jerseys | Cleats | Accessories<br />
+            Pan-India Shipping 🌍
           </p>
         </div>
       </div>
@@ -111,33 +119,35 @@ export default function Home() {
         marginTop: "-28px",
         position: "relative",
         zIndex: 1,
-        padding: "32px 16px 60px"
+        padding: "28px 14px 60px"
       }}>
 
         {/* CATEGORY TABS */}
         <div style={{
           display: "flex",
           gap: "8px",
-          marginBottom: "24px",
+          marginBottom: "20px",
           overflowX: "auto",
-          paddingBottom: "6px",
+          paddingBottom: "8px",
           scrollbarWidth: "none" as any,
+          msOverflowStyle: "none" as any,
         }}>
+          <style>{`::-webkit-scrollbar { display: none; }`}</style>
           {["featured", "jerseys", "cleats", "accessories", "gloves", "balls"].map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               style={{
-                padding: "9px 16px",
+                padding: "8px 14px",
                 borderRadius: "999px",
                 border: "1px solid #222",
                 background: selectedCategory === cat ? "#2563eb" : "#111",
-                color: selectedCategory === cat ? "#000" : "#aaa",
+                color: selectedCategory === cat ? "#fff" : "#aaa",
                 fontWeight: "700",
                 whiteSpace: "nowrap",
                 flexShrink: 0,
                 cursor: "pointer",
-                fontSize: "12px",
+                fontSize: "11px",
                 letterSpacing: "0.5px"
               }}
             >
@@ -146,22 +156,29 @@ export default function Home() {
           ))}
         </div>
 
-        {/* PRODUCT GRID — always 2 cols on mobile, 3 on tablet, 5 on desktop */}
+        {/* PRODUCT GRID */}
         <div style={{
           display: "grid",
           gridTemplateColumns: "repeat(2, 1fr)",
-          gap: "12px",
+          gap: "10px",
           width: "100%"
         }}>
           <style>{`
-            @media (min-width: 640px)  { .pgrid { grid-template-columns: repeat(3, 1fr) !important; } }
-            @media (min-width: 1024px) { .pgrid { grid-template-columns: repeat(5, 1fr) !important; } }
-            .pgrid { display: grid; gap: 12px; width: 100%; }
+            @media (min-width: 600px)  { .pgrid { grid-template-columns: repeat(3, 1fr) !important; } }
+            @media (min-width: 900px)  { .pgrid { grid-template-columns: repeat(4, 1fr) !important; } }
+            @media (min-width: 1200px) { .pgrid { grid-template-columns: repeat(5, 1fr) !important; } }
           `}</style>
+
+          {filtered.length === 0 && (
+            <p style={{ color: "#444", gridColumn: "1/-1", textAlign: "center", padding: "40px 0" }}>
+              No products in this category yet.
+            </p>
+          )}
 
           {filtered.map(product => (
             <div
               key={product.id}
+              className="pgrid"
               style={{
                 background: "#0a0a0a",
                 padding: "12px",
@@ -186,7 +203,7 @@ export default function Home() {
 
               <h3 style={{
                 color: "white",
-                fontSize: "clamp(11px, 3vw, 13px)",
+                fontSize: "clamp(11px, 2.8vw, 13px)",
                 marginTop: "10px",
                 flexGrow: 1,
                 lineHeight: "1.4",
@@ -216,20 +233,20 @@ export default function Home() {
                   borderRadius: "10px",
                   border: "none",
                   background: "#2563eb",
-                  color: "#000",
+                  color: "#fff",
                   fontWeight: "800",
                   cursor: "pointer",
-                  fontSize: "13px"
+                  fontSize: "12px"
                 }}
               >
-                Add
+                Add to Cart
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ======= SIZE POPUP — slides up from bottom on mobile ======= */}
+      {/* ======= SIZE POPUP — bottom sheet ======= */}
       {popupProduct && (
         <div
           onClick={() => setPopupProduct(null)}
@@ -247,7 +264,7 @@ export default function Home() {
             onClick={e => e.stopPropagation()}
             style={{
               background: "#0d0d0d",
-              padding: "20px 20px 36px",
+              padding: "20px 20px 40px",
               borderRadius: "24px 24px 0 0",
               width: "100%",
               maxWidth: "500px",
@@ -307,7 +324,7 @@ export default function Home() {
                         ? "2px solid #2563eb"
                         : "1px solid #2a2a2a",
                       background: selectedSize === size ? "#2563eb" : out ? "#0a0a0a" : "#1a1a1a",
-                      color: selectedSize === size ? "#000" : out ? "#444" : "white",
+                      color: selectedSize === size ? "#fff" : out ? "#444" : "white",
                       opacity: out ? 0.5 : 1,
                       cursor: out ? "not-allowed" : "pointer",
                       fontWeight: "800",
@@ -350,7 +367,7 @@ export default function Home() {
                 borderRadius: "14px",
                 fontWeight: "900",
                 fontSize: "16px",
-                color: selectedSize ? "#000" : "#444",
+                color: selectedSize ? "#fff" : "#444",
                 cursor: selectedSize ? "pointer" : "not-allowed",
               }}
             >
