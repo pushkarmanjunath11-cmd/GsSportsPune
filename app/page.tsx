@@ -49,65 +49,78 @@ export default function Home() {
   return (
     <div style={{ background: "#000", minHeight: "100vh" }}>
 
-      {/* HERO */}
+      {/* ======= HERO ======= */}
       <div style={{
         height: "100vh",
-        position: "fixed",
-        top: 0, left: 0,
         width: "100%",
-        zIndex: -1,
+        position: "relative",
         overflow: "hidden"
       }}>
         <img
           src="/images/hero.png"
-          style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(.4)" }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            filter: "brightness(.4)",
+            display: "block"
+          }}
         />
+
+        {/* gradient fade to black at bottom */}
         <div style={{
-          position: "absolute", width: "100%", height: "100%",
-          background: "linear-gradient(to bottom, rgba(0,0,0,0.2), #000)"
+          position: "absolute",
+          bottom: 0, left: 0,
+          width: "100%",
+          height: "40%",
+          background: "linear-gradient(to bottom, transparent, #000)"
         }} />
+
+        {/* hero text */}
         <div style={{
           position: "absolute",
           top: "50%", left: "50%",
           transform: "translate(-50%,-50%)",
           textAlign: "center",
-          padding: "0 20px",
-          width: "100%"
+          width: "100%",
+          padding: "0 20px"
         }}>
           <h1 style={{
-            fontSize: "clamp(36px, 10vw, 120px)",
+            fontSize: "clamp(40px, 12vw, 120px)",
             fontWeight: 900,
             letterSpacing: "-2px",
             background: "linear-gradient(90deg,#ff7a00,#ffffff)",
             WebkitBackgroundClip: "text",
             color: "transparent",
-            whiteSpace: "nowrap"
+            whiteSpace: "nowrap",
+            lineHeight: 1
           }}>
             MAD BALLERS
           </h1>
-          <p style={{ color: "#ccc", fontSize: "clamp(14px, 3vw, 20px)" }}>
+          <p style={{ color: "#ccc", fontSize: "clamp(13px, 3vw, 20px)", marginTop: "12px" }}>
             Premium Football Store
           </p>
         </div>
       </div>
 
-      {/* PRODUCTS SECTION */}
+      {/* ======= PRODUCTS SECTION ======= */}
       <div style={{
-        marginTop: "100vh",
         background: "#050505",
-        borderTopLeftRadius: "32px",
-        borderTopRightRadius: "32px",
-        padding: "clamp(24px, 5vw, 50px) clamp(12px, 4vw, 24px)"
+        borderTopLeftRadius: "28px",
+        borderTopRightRadius: "28px",
+        marginTop: "-28px",
+        position: "relative",
+        zIndex: 1,
+        padding: "32px 16px 60px"
       }}>
 
         {/* CATEGORY TABS */}
         <div style={{
           display: "flex",
           gap: "8px",
-          marginBottom: "32px",
+          marginBottom: "24px",
           overflowX: "auto",
-          paddingBottom: "8px",
-          WebkitOverflowScrolling: "touch" as any,
+          paddingBottom: "6px",
           scrollbarWidth: "none" as any,
         }}>
           {["featured", "boots", "jerseys", "gloves", "jackets", "balls", "gear"].map(cat => (
@@ -115,7 +128,7 @@ export default function Home() {
               key={cat}
               onClick={() => setSelectedCategory(cat)}
               style={{
-                padding: "10px 16px",
+                padding: "9px 16px",
                 borderRadius: "999px",
                 border: "1px solid #222",
                 background: selectedCategory === cat ? "#ff7a00" : "#111",
@@ -124,7 +137,8 @@ export default function Home() {
                 whiteSpace: "nowrap",
                 flexShrink: 0,
                 cursor: "pointer",
-                fontSize: "clamp(11px, 2.5vw, 13px)"
+                fontSize: "12px",
+                letterSpacing: "0.5px"
               }}
             >
               {cat.toUpperCase()}
@@ -132,48 +146,71 @@ export default function Home() {
           ))}
         </div>
 
-        {/* PRODUCT GRID */}
+        {/* PRODUCT GRID — always 2 cols on mobile, 3 on tablet, 5 on desktop */}
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: "clamp(10px, 2vw, 20px)",
+          gridTemplateColumns: "repeat(2, 1fr)",
+          gap: "12px",
           width: "100%"
         }}>
+          <style>{`
+            @media (min-width: 640px)  { .pgrid { grid-template-columns: repeat(3, 1fr) !important; } }
+            @media (min-width: 1024px) { .pgrid { grid-template-columns: repeat(5, 1fr) !important; } }
+            .pgrid { display: grid; gap: 12px; width: 100%; }
+          `}</style>
+
           {filtered.map(product => (
             <div
               key={product.id}
               style={{
                 background: "#0a0a0a",
                 padding: "12px",
-                borderRadius: "16px",
-                border: "1px solid #111",
-                transition: "0.3s",
+                borderRadius: "14px",
+                border: "1px solid #161616",
                 display: "flex",
                 flexDirection: "column",
-                justifyContent: "space-between"
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-6px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              <Link href={`/product/${product.id}`}>
+              <Link href={`/product/${product.id}`} style={{ display: "block" }}>
                 <img
                   src={product.images?.[0] || "/placeholder.png"}
-                  style={{ width: "100%", height: "clamp(120px, 20vw, 180px)", objectFit: "contain" }}
+                  style={{
+                    width: "100%",
+                    aspectRatio: "1 / 1",
+                    objectFit: "contain",
+                    borderRadius: "10px",
+                    background: "#111"
+                  }}
                 />
               </Link>
 
-              <h3 style={{ color: "white", fontSize: "clamp(12px, 2.5vw, 14px)", marginTop: "8px", flexGrow: 1 }}>
+              <h3 style={{
+                color: "white",
+                fontSize: "clamp(11px, 3vw, 13px)",
+                marginTop: "10px",
+                flexGrow: 1,
+                lineHeight: "1.4",
+                overflow: "hidden",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical" as any,
+              }}>
                 {product.name}
               </h3>
 
-              <p style={{ color: "#ff7a00", fontWeight: "800", fontSize: "clamp(12px, 2.5vw, 14px)" }}>
+              <p style={{
+                color: "#ff7a00",
+                fontWeight: "800",
+                fontSize: "clamp(12px, 3vw, 14px)",
+                marginTop: "6px"
+              }}>
                 ₹{product.price}
               </p>
 
               <button
                 onClick={() => { setPopupProduct(product); setSelectedSize(null); }}
                 style={{
-                  marginTop: "8px",
+                  marginTop: "10px",
                   width: "100%",
                   padding: "10px",
                   borderRadius: "10px",
@@ -182,7 +219,7 @@ export default function Home() {
                   color: "#000",
                   fontWeight: "800",
                   cursor: "pointer",
-                  fontSize: "clamp(12px, 2.5vw, 14px)"
+                  fontSize: "13px"
                 }}
               >
                 Add
@@ -192,39 +229,68 @@ export default function Home() {
         </div>
       </div>
 
-      {/* SIZE POPUP */}
+      {/* ======= SIZE POPUP — slides up from bottom on mobile ======= */}
       {popupProduct && (
         <div
           onClick={() => setPopupProduct(null)}
           style={{
             position: "fixed", top: 0, left: 0,
             width: "100%", height: "100%",
-            background: "rgba(0,0,0,.9)",
-            display: "flex", justifyContent: "center", alignItems: "center",
+            background: "rgba(0,0,0,.85)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-end",
             zIndex: 9999,
-            padding: "16px"
           }}
         >
           <div
             onClick={e => e.stopPropagation()}
             style={{
-              background: "#050505",
-              padding: "clamp(16px, 4vw, 28px)",
-              borderRadius: "20px",
+              background: "#0d0d0d",
+              padding: "20px 20px 36px",
+              borderRadius: "24px 24px 0 0",
               width: "100%",
-              maxWidth: "400px",
-              maxHeight: "90vh",
-              overflowY: "auto"
+              maxWidth: "500px",
+              maxHeight: "85vh",
+              overflowY: "auto",
+              border: "1px solid #1a1a1a",
+              borderBottom: "none"
             }}
           >
-            <img src={popupProduct.images?.[0]} style={{ width: "100%", borderRadius: "12px" }} />
+            {/* drag handle */}
+            <div style={{
+              width: "40px", height: "4px",
+              background: "#333", borderRadius: "999px",
+              margin: "0 auto 20px"
+            }} />
 
-            <h2 style={{ color: "white", marginTop: "14px", fontSize: "clamp(16px, 4vw, 22px)" }}>
-              {popupProduct.name}
-            </h2>
-            <p style={{ color: "#ff7a00", fontWeight: "800" }}>₹{popupProduct.price}</p>
+            <div style={{ display: "flex", gap: "14px", alignItems: "center", marginBottom: "20px" }}>
+              <img
+                src={popupProduct.images?.[0]}
+                style={{
+                  width: "80px", height: "80px",
+                  objectFit: "contain",
+                  borderRadius: "12px",
+                  background: "#111",
+                  padding: "6px",
+                  flexShrink: 0
+                }}
+              />
+              <div>
+                <h2 style={{ color: "white", fontSize: "16px", fontWeight: "800", lineHeight: "1.4" }}>
+                  {popupProduct.name}
+                </h2>
+                <p style={{ color: "#ff7a00", fontWeight: "800", fontSize: "18px", marginTop: "4px" }}>
+                  ₹{popupProduct.price}
+                </p>
+              </div>
+            </div>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", margin: "16px 0" }}>
+            <p style={{ color: "#555", fontSize: "11px", marginBottom: "12px", letterSpacing: "1.5px" }}>
+              SELECT SIZE
+            </p>
+
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px", marginBottom: "20px" }}>
               {Object.entries(popupProduct.sizes || {}).map(([size, stock]) => {
                 const out = Number(stock) <= 0;
                 return (
@@ -233,17 +299,32 @@ export default function Home() {
                     disabled={out}
                     onClick={() => setSelectedSize(size)}
                     style={{
-                      width: "44px", height: "44px",
-                      borderRadius: "50%",
-                      border: selectedSize === size ? "2px solid #ff7a00" : "1px solid #333",
-                      background: out ? "#111" : "#000",
-                      color: out ? "#555" : "white",
-                      opacity: out ? 0.4 : 1,
+                      minWidth: "52px",
+                      height: "52px",
+                      padding: "0 14px",
+                      borderRadius: "12px",
+                      border: selectedSize === size
+                        ? "2px solid #ff7a00"
+                        : "1px solid #2a2a2a",
+                      background: selectedSize === size ? "#ff7a00" : out ? "#0a0a0a" : "#1a1a1a",
+                      color: selectedSize === size ? "#000" : out ? "#444" : "white",
+                      opacity: out ? 0.5 : 1,
                       cursor: out ? "not-allowed" : "pointer",
-                      fontWeight: "700"
+                      fontWeight: "800",
+                      fontSize: "13px",
+                      position: "relative"
                     }}
                   >
                     {size}
+                    {out && (
+                      <span style={{
+                        position: "absolute", top: "-5px", right: "-5px",
+                        fontSize: "8px", background: "#ff2d00",
+                        padding: "1px 5px", borderRadius: "4px", fontWeight: "900"
+                      }}>
+                        OUT
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -263,17 +344,17 @@ export default function Home() {
               }}
               style={{
                 width: "100%",
-                padding: "14px",
-                background: selectedSize ? "#ff7a00" : "#222",
+                padding: "18px",
+                background: selectedSize ? "linear-gradient(90deg,#ff7a00,#ffb347)" : "#1a1a1a",
                 border: "none",
-                borderRadius: "10px",
+                borderRadius: "14px",
                 fontWeight: "900",
-                color: selectedSize ? "#000" : "#666",
+                fontSize: "16px",
+                color: selectedSize ? "#000" : "#444",
                 cursor: selectedSize ? "pointer" : "not-allowed",
-                fontSize: "16px"
               }}
             >
-              Add To Cart
+              {selectedSize ? `Add to Cart — ₹${popupProduct.price}` : "Select a Size"}
             </button>
           </div>
         </div>

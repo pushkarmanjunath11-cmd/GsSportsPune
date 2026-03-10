@@ -72,8 +72,6 @@ export default function Footer() {
           opacity: 0.6
         }}>
           © {new Date().getFullYear()} Boots Vault. All rights reserved.
-          © {new Date().getFullYear()} No returns on used products.
-          © {new Date().getFullYear()} Replacement available within 3 days.
         </p>
 
       </div>
