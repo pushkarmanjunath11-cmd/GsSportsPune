@@ -106,7 +106,7 @@ export default function CartDrawer({ open, setOpen }: any) {
                   {item.name}
                 </p>
                 <p style={{ color: "#999", fontSize: "12px" }}>Size: {item.size}</p>
-                <p style={{ color: "#ff7a00", fontWeight: "700", fontSize: "14px" }}>₹{item.price}</p>
+                <p style={{ color: "#2563eb", fontWeight: "700", fontSize: "14px" }}>₹{item.price}</p>
               </div>
 
               <button
@@ -134,13 +134,13 @@ export default function CartDrawer({ open, setOpen }: any) {
           <div style={{ paddingTop: "16px", borderTop: "1px solid rgba(255,255,255,.06)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "14px" }}>
               <span style={{ color: "#999" }}>Total</span>
-              <span style={{ color: "#ff7a00", fontWeight: "900", fontSize: "18px" }}>₹{total}</span>
+              <span style={{ color: "#2563eb", fontWeight: "900", fontSize: "18px" }}>₹{total}</span>
             </div>
             <Link href="/checkout" onClick={() => setOpen(false)}>
               <button style={{
                 width: "100%",
                 padding: "16px",
-                background: "linear-gradient(90deg,#ff7a00,#ffb347)",
+                background: "linear-gradient(90deg,#2563eb,#3b82f6)",
                 border: "none",
                 borderRadius: "12px",
                 fontWeight: "900",

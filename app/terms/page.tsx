@@ -4,7 +4,7 @@ return(
 <h1>Terms & Conditions</h1>
 
 <p>
-By using Boots Vault you agree to our policies.
+By using Gs Sports Pune you agree to our policies.
 All products are subject to availability.
 </p>
 </div>

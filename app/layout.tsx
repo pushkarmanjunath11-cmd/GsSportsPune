@@ -3,8 +3,8 @@ import { CartProvider } from "./context/CartContext";
 import Navbar from "./components/Navbar";
 
 export const metadata = {
-  title: "Mad Ballers",
-  description: "Elite Sports Store",
+  title: "GS Sports Pune",
+  description: "For the Love of Football — Jerseys, Cleats & Accessories",
 };
 
 export default function RootLayout({

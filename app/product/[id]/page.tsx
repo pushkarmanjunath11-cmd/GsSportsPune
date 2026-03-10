@@ -120,7 +120,7 @@ export default function ProductPage() {
                     width: i === currentImage ? "24px" : "8px",
                     height: "8px",
                     borderRadius: "999px",
-                    background: i === currentImage ? "#ff7a00" : "#333",
+                    background: i === currentImage ? "#2563eb" : "#333",
                     cursor: "pointer",
                     transition: "0.3s"
                   }}

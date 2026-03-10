@@ -11,13 +11,12 @@ const router = useRouter();
 
 /* SIZE MAP */
 
-const sizeMap:any = {
-boots:["6","6.5","7","7.5","8","8.5","9","9.5","10","10.5","11"],
-jerseys:["S","M","L","XL"],
-gloves:["7","8","9","10"],
-jackets:["S","M","L","XL"],
-balls:["3","4","5"],
-gear:["Standard"]
+const sizeMap: Record<string, string[]> = {
+  jerseys: ["S", "M", "L", "XL", "XXL"],
+  cleats: ["6", "6.5", "7", "7.5", "8", "8.5", "9", "9.5", "10", "10.5", "11"],
+  accessories: ["Standard"],
+  gloves: ["7", "8", "9", "10"],
+  balls: ["3", "4", "5"],
 };
 
 /* STATE */
@@ -128,12 +127,11 @@ value={category}
 onChange={(e)=>setCategory(e.target.value)}
 style={input}
 >
-<option value="boots">Boots</option>
 <option value="jerseys">Jerseys</option>
+<option value="cleats">Cleats</option>
+<option value="accessories">Accessories</option>
 <option value="gloves">Gloves</option>
-<option value="jackets">Jackets</option>
 <option value="balls">Balls</option>
-<option value="gear">Gear</option>
 </select>
 
 <input

@@ -38,7 +38,7 @@ export default function Navbar() {
             background: "linear-gradient(90deg,#ffffff,#9ca3af)",
             WebkitBackgroundClip: "text", color: "transparent"
           }}>
-            Mad Ballers
+            GS Sports
           </span>
         </Link>
 

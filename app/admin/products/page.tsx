@@ -134,7 +134,7 @@ height:"90px"
 </h2>
 
 <p style={{
-color:"#ff7a00",
+color:"#2563eb",
 fontWeight:"800",
 fontSize:"18px"
 }}>

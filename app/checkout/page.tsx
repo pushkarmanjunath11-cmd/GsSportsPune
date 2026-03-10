@@ -13,7 +13,7 @@ export default function Checkout() {
       return;
     }
 
-    let message = `🔥 *NEW ORDER — MAD BALLERS* 🔥%0A%0A`;
+    let message = `🔥 *NEW ORDER — Gs Sports Pune* 🔥%0A%0A`;
 
     cart.forEach(item => {
       message += `• ${item.name}%0A`;
@@ -98,7 +98,7 @@ export default function Checkout() {
               }}>
                 {item.name}
               </h3>
-              <p style={{ color: "#ff7a00", fontSize: "clamp(13px, 3vw, 15px)", fontWeight: "700" }}>
+              <p style={{ color: "#2563eb", fontSize: "clamp(13px, 3vw, 15px)", fontWeight: "700" }}>
                 ₹{item.price}
               </p>
               {item.size && (
@@ -113,7 +113,7 @@ export default function Checkout() {
         {cart.length > 0 && (
           <>
             <h2 style={{ marginTop: "28px", fontSize: "clamp(18px, 4vw, 24px)" }}>
-              Total: <span style={{ color: "#ff7a00" }}>₹{total}</span>
+              Total: <span style={{ color: "#2563eb" }}>₹{total}</span>
             </h2>
 
             <button
@@ -124,7 +124,7 @@ export default function Checkout() {
                 padding: "clamp(14px, 4vw, 18px)",
                 borderRadius: "14px",
                 border: "none",
-                background: "linear-gradient(90deg,#ff7a00,#ffb347)",
+                background: "linear-gradient(90deg,#2563eb,#3b82f6)",
                 color: "#000",
                 fontWeight: "900",
                 fontSize: "clamp(15px, 3.5vw, 18px)",

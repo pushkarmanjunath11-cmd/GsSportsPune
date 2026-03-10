@@ -89,16 +89,16 @@ export default function Home() {
             fontSize: "clamp(40px, 12vw, 120px)",
             fontWeight: 900,
             letterSpacing: "-2px",
-            background: "linear-gradient(90deg,#ff7a00,#ffffff)",
+            background: "linear-gradient(90deg,#2563eb,#ffffff)",
             WebkitBackgroundClip: "text",
             color: "transparent",
             whiteSpace: "nowrap",
             lineHeight: 1
           }}>
-            MAD BALLERS
+            GS SPORTS PUNE
           </h1>
           <p style={{ color: "#ccc", fontSize: "clamp(13px, 3vw, 20px)", marginTop: "12px" }}>
-            Premium Football Store
+            Jerseys | Cleats | Accessories — Pan-India Shipping 🌍
           </p>
         </div>
       </div>
@@ -123,7 +123,7 @@ export default function Home() {
           paddingBottom: "6px",
           scrollbarWidth: "none" as any,
         }}>
-          {["featured", "boots", "jerseys", "gloves", "jackets", "balls", "gear"].map(cat => (
+          {["featured", "jerseys", "cleats", "accessories", "gloves", "balls"].map(cat => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
@@ -131,7 +131,7 @@ export default function Home() {
                 padding: "9px 16px",
                 borderRadius: "999px",
                 border: "1px solid #222",
-                background: selectedCategory === cat ? "#ff7a00" : "#111",
+                background: selectedCategory === cat ? "#2563eb" : "#111",
                 color: selectedCategory === cat ? "#000" : "#aaa",
                 fontWeight: "700",
                 whiteSpace: "nowrap",
@@ -199,7 +199,7 @@ export default function Home() {
               </h3>
 
               <p style={{
-                color: "#ff7a00",
+                color: "#2563eb",
                 fontWeight: "800",
                 fontSize: "clamp(12px, 3vw, 14px)",
                 marginTop: "6px"
@@ -215,7 +215,7 @@ export default function Home() {
                   padding: "10px",
                   borderRadius: "10px",
                   border: "none",
-                  background: "#ff7a00",
+                  background: "#2563eb",
                   color: "#000",
                   fontWeight: "800",
                   cursor: "pointer",
@@ -280,7 +280,7 @@ export default function Home() {
                 <h2 style={{ color: "white", fontSize: "16px", fontWeight: "800", lineHeight: "1.4" }}>
                   {popupProduct.name}
                 </h2>
-                <p style={{ color: "#ff7a00", fontWeight: "800", fontSize: "18px", marginTop: "4px" }}>
+                <p style={{ color: "#2563eb", fontWeight: "800", fontSize: "18px", marginTop: "4px" }}>
                   ₹{popupProduct.price}
                 </p>
               </div>
@@ -304,9 +304,9 @@ export default function Home() {
                       padding: "0 14px",
                       borderRadius: "12px",
                       border: selectedSize === size
-                        ? "2px solid #ff7a00"
+                        ? "2px solid #2563eb"
                         : "1px solid #2a2a2a",
-                      background: selectedSize === size ? "#ff7a00" : out ? "#0a0a0a" : "#1a1a1a",
+                      background: selectedSize === size ? "#2563eb" : out ? "#0a0a0a" : "#1a1a1a",
                       color: selectedSize === size ? "#000" : out ? "#444" : "white",
                       opacity: out ? 0.5 : 1,
                       cursor: out ? "not-allowed" : "pointer",
@@ -345,7 +345,7 @@ export default function Home() {
               style={{
                 width: "100%",
                 padding: "18px",
-                background: selectedSize ? "linear-gradient(90deg,#ff7a00,#ffb347)" : "#1a1a1a",
+                background: selectedSize ? "linear-gradient(90deg,#2563eb,#3b82f6)" : "#1a1a1a",
                 border: "none",
                 borderRadius: "14px",
                 fontWeight: "900",

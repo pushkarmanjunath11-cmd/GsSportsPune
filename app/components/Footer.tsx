@@ -26,7 +26,7 @@ export default function Footer() {
           fontSize: "22px",
           letterSpacing: "1px"
         }}>
-          Boots Vault
+          GS Sports Pune
         </h2>
 
         {/* TAGLINE */}
@@ -35,7 +35,7 @@ export default function Footer() {
           fontSize: "14px",
           opacity: 0.7
         }}>
-          Premium Football Boots, Jerseys & Gear
+          For the Love of Football 🌍 | Jerseys | Cleats | Accessories
         </p>
 
         {/* CONTACT */}
@@ -44,8 +44,8 @@ export default function Footer() {
           fontSize: "14px",
           lineHeight: "1.8"
         }}>
-          <div>Email: Gsingson21@gmail.com</div>
-          <div>WhatsApp: +91 9366946633</div>
+          <div>WhatsApp: chat.whatsapp.com/CzVF25PCYEVFqapavlMjgz</div>
+          <div>Location: Pune</div>
         </div>
 
         <div style={{
@@ -53,8 +53,8 @@ export default function Footer() {
           fontSize: "13px",
           opacity: 0.7
         }}>
-          <div>No returns on used products.</div>
-          <div>Size exchanges available within 3 days.</div>
+          <div>Pan-India Shipping available.</div>
+          <div>DM us on Instagram @gssports_punee</div>
         </div>
 
         {/* DIVIDER */}
@@ -71,7 +71,7 @@ export default function Footer() {
           fontSize: "13px",
           opacity: 0.6
         }}>
-          © {new Date().getFullYear()} Boots Vault. All rights reserved.
+          © {new Date().getFullYear()} Gs Sports Pune. All rights reserved.
         </p>
 
       </div>

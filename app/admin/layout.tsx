@@ -50,7 +50,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     textDecoration: "none",
     fontSize: "clamp(13px, 2vw, 15px)",
     background: path === href
-      ? "linear-gradient(135deg,#ff7a00,#ffb347)"
+      ? "linear-gradient(135deg,#2563eb,#3b82f6)"
       : "transparent",
     color: path === href ? "#02120a" : "#9ca3af",
     transition: "0.25s"
@@ -111,7 +111,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           color: "white",
           textAlign: "center"
         }}>
-          ⚡ Boots Vault Admin
+          ⚡ GS Sports Admin
         </h1>
 
         <Link href="/admin" style={nav("/admin")}>📊 Dashboard</Link>
@@ -168,7 +168,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 borderRadius: "10px",
                 fontWeight: "700",
                 textDecoration: "none",
-                background: path === item.href ? "linear-gradient(135deg,#ff7a00,#ffb347)" : "transparent",
+                background: path === item.href ? "linear-gradient(135deg,#2563eb,#3b82f6)" : "transparent",
                 color: path === item.href ? "#02120a" : "#9ca3af",
               }}
             >
