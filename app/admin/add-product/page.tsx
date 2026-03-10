@@ -48,46 +48,43 @@ setSizes(emptyStock);
 
 /* ADD PRODUCT */
 
-async function addProduct(){
+async function addProduct() {
+  const cleanImages = images.filter(img => img.trim() !== "");
 
-const cleanImages = images.filter(img => img.trim() !== "");
+  if (!name || !price || cleanImages.length === 0) {
+    alert("Fill all fields!");
+    return;
+  }
 
-if(!name || !price || cleanImages.length === 0){
-alert("Fill all fields!");
-return;
+  const formattedSizes = Object.fromEntries(
+    Object.entries(sizes).map(([size, qty]) => [size, Number(qty) || 0])
+  );
+
+  if (Object.values(formattedSizes).every(qty => qty <= 0)) {
+    alert("Add stock before creating product");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    await addDoc(collection(db, "products"), {
+      name,
+      price: Number(price),
+      images: cleanImages,
+      category,
+      sizes: formattedSizes,
+      featured,
+      createdAt: new Date()
+    });
+    alert("✅ Product Added!");
+    router.push("/admin/products");
+  } catch (err) {
+    console.error("Failed to add product:", err);
+    alert("❌ Failed to add product. Please try again.");
+  } finally {
+    setLoading(false); // ✅ always resets, even on failure
+  }
 }
-
-const formattedSizes = Object.fromEntries(
-Object.entries(sizes).map(([size,qty])=>[
-size,
-Number(qty) || 0
-])
-);
-
-if(Object.values(formattedSizes).every(qty => qty <= 0)){
-alert("Add stock before creating product");
-return;
-}
-
-setLoading(true);
-
-await addDoc(collection(db,"products"),{
-name,
-price:Number(price),
-images: cleanImages,
-category,
-sizes:formattedSizes,
-featured,
-createdAt:new Date()
-});
-
-setLoading(false);
-
-alert("✅ Product Added!");
-
-router.push("/admin/products");
-}
-
 
 /* UI */
 

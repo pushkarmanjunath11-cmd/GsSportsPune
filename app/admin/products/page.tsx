@@ -15,63 +15,53 @@ export default function ProductsPage(){
 const [products,setProducts] = useState<any[]>([]);
 const [loading,setLoading] = useState(true);
 
-useEffect(()=>{
-
-async function fetchProducts(){
-
-const snap = await getDocs(collection(db,"products"));
-
-const list = snap.docs.map(doc=>({
-id:doc.id,
-...doc.data()
-}));
-
-setProducts(list);
-setLoading(false);
-}
-
-fetchProducts();
-
-},[]);
-
+useEffect(() => {
+  async function fetchProducts() {
+    try {
+      const snap = await getDocs(collection(db, "products"));
+      const list = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setProducts(list as any[]);
+    } catch (err) {
+      console.error("Failed to fetch products:", err);
+      alert("❌ Could not load products. Please refresh.");
+    } finally {
+      setLoading(false);
+    }
+  }
+  fetchProducts();
+}, []);
 
 /* DELETE PRODUCT */
 
-async function deleteProduct(id:string){
+async function deleteProduct(id: string) {
+  const confirmDelete = confirm("Delete this product permanently?");
+  if (!confirmDelete) return;
 
-const confirmDelete = confirm("Delete this product permanently?");
-
-if(!confirmDelete) return;
-
-await deleteDoc(doc(db,"products",id));
-
-setProducts(prev => prev.filter(p=>p.id !== id));
+  try {
+    await deleteDoc(doc(db, "products", id));
+    setProducts(prev => prev.filter(p => p.id !== id));
+  } catch (err) {
+    console.error("Failed to delete product:", err);
+    alert("❌ Could not delete product. Try again.");
+  }
 }
-
 
 /* UPDATE STOCK */
 
-async function updateStock(id:string,size:string,value:number){
+async function updateStock(id: string, size: string, value: number) {
+  const product = products.find(p => p.id === id);
+  const newSizes = { ...product.sizes, [size]: value };
 
-const product = products.find(p=>p.id === id);
-
-const newSizes = {
-...product.sizes,
-[size]:value
-};
-
-await updateDoc(doc(db,"products",id),{
-sizes:newSizes
-});
-
-setProducts(prev =>
-prev.map(p=>
-p.id === id
-? {...p,sizes:newSizes}
-: p
-));
+  try {
+    await updateDoc(doc(db, "products", id), { sizes: newSizes });
+    setProducts(prev =>
+      prev.map(p => p.id === id ? { ...p, sizes: newSizes } : p)
+    );
+  } catch (err) {
+    console.error("Failed to update stock:", err);
+    alert("❌ Could not update stock. Try again.");
+  }
 }
-
 
 /* LOW STOCK CHECK */
 
@@ -217,8 +207,8 @@ Size {size}
 
 <input
 type="number"
-value={qty}
-onChange={(e)=>
+defaultValue={qty}
+onBlur={(e)=>
 updateStock(
 product.id,
 size,

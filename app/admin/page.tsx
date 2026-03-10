@@ -10,28 +10,24 @@ const [orders,setOrders] = useState(0);
 const [revenue,setRevenue] = useState(0);
 const [products,setProducts] = useState(0);
 
-useEffect(()=>{
+useEffect(() => {
+  async function load() {
+    try {
+      const ordersSnap = await getDocs(collection(db, "orders"));
+      const productsSnap = await getDocs(collection(db, "products"));
 
-async function load(){
+      let total = 0;
+      ordersSnap.forEach((doc: any) => { total += doc.data().total || 0; });
 
-const ordersSnap = await getDocs(collection(db,"orders"));
-const productsSnap = await getDocs(collection(db,"products"));
-
-let total = 0;
-
-ordersSnap.forEach((doc:any)=>{
-total += doc.data().total || 0;
-});
-
-setOrders(ordersSnap.size);
-setRevenue(total);
-setProducts(productsSnap.size);
-}
-
-load();
-
-},[]);
-
+      setOrders(ordersSnap.size);
+      setRevenue(total);
+      setProducts(productsSnap.size);
+    } catch (err) {
+      console.error("Failed to load dashboard:", err);
+    }
+  }
+  load();
+}, []);
 
 const card = {
 flex:1,

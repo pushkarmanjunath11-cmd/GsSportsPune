@@ -3,7 +3,7 @@ export default function FloatingWhatsApp(){
 return(
 
 <a
-href="https://wa.me/919366946633"
+href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER}`}
 target="_blank"
 style={{
 position:"fixed",

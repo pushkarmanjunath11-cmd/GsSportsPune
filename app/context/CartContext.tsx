@@ -25,74 +25,65 @@ clearCart:()=>void;
 
 const CartContext = createContext<CartContextType | null>(null);
 
-export function CartProvider({children}:{children:React.ReactNode}){
+export function CartProvider({ children }: { children: React.ReactNode }) {
 
-const [cart,setCart] = useState<CartItem[]>([]);
-const [user,setUser] = useState<any>(null);
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [user, setUser] = useState<any>(null);
+  const [cartLoaded, setCartLoaded] = useState(false); // ✅ NEW
 
-/* 🔥 WATCH LOGIN */
+  /* WATCH LOGIN */
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged(async (u) => {
+      setUser(u);
 
-useEffect(()=>{
+      if (u) {
+        try {
+          const ref = doc(db, "carts", u.uid);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            setCart(snap.data().items || []);
+          }
+        } catch (err) {
+          console.error("Failed to load cart:", err);
+        }
+      } else {
+        setCart([]); // clear cart on logout
+      }
 
-const unsub = auth.onAuthStateChanged(async(u)=>{
+      setCartLoaded(true); // ✅ only true AFTER loading from Firestore
+    });
 
-setUser(u);
+    return () => unsub();
+  }, []);
 
-if(u){
+  /* AUTO SAVE CART — only after cart is loaded from Firestore */
+  useEffect(() => {
+    if (!user || !cartLoaded) return; // ✅ prevents overwriting on mount
 
-const ref = doc(db,"carts",u.uid);
-const snap = await getDoc(ref);
+    try {
+      setDoc(doc(db, "carts", user.uid), { items: cart });
+    } catch (err) {
+      console.error("Failed to save cart:", err);
+    }
+  }, [cart, user, cartLoaded]);
 
-if(snap.exists()){
-setCart(snap.data().items || []);
-}
+  function addToCart(item: CartItem) {
+    setCart(prev => [...prev, item]);
+  }
 
-}
+  function removeFromCart(index: number) {
+    setCart(prev => prev.filter((_, i) => i !== index)); // ✅ fixed
+  }
 
-});
+  function clearCart() {
+    setCart([]);
+  }
 
-return ()=>unsub();
-
-},[]);
-
-
-/* 🔥 AUTO SAVE CART */
-
-useEffect(()=>{
-
-if(!user) return;
-
-setDoc(doc(db,"carts",user.uid),{
-items:cart
-});
-
-},[cart,user]);
-
-
-/* FUNCTIONS */
-
-function addToCart(item:CartItem){
-setCart(prev=>[...prev,item]);
-}
-
-function removeFromCart(index:number){
-setCart(prev => prev.filter((_, i) => i ! == index));
-}
-
-function clearCart(){
-setCart([]);
-}
-
-return(
-<CartContext.Provider value={{
-cart,
-addToCart,
-removeFromCart,
-clearCart
-}}>
-{children}
-</CartContext.Provider>
-);
+  return (
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart }}>
+      {children}
+    </CartContext.Provider>
+  );
 }
 
 export function useCart(){

@@ -10,6 +10,24 @@ updateDoc,
 getDoc
 } from "firebase/firestore";
 
+// Add at the top of the file, after imports
+type OrderItem = {
+  id: string;
+  name: string;
+  size: string;
+  price: number;
+};
+
+type Order = {
+  id: string;
+  total: number;
+  status: string;
+  items: OrderItem[];
+};
+
+// Then update state:
+const [orders, setOrders] = useState<Order[]>([]);
+
 async function reduceStock(order:any){
 
 for(const item of order.items){
@@ -79,7 +97,7 @@ sizes: updatedSizes
 
 /* 🔥 CHANGE STATUS */
 
-async function changeStatus(order:any,status:string){
+async function changeStatus(order: Order, status: string){
 
 if(status === "Confirmed"){
 await reduceStock(order);
@@ -149,12 +167,6 @@ marginTop:"10px"
 <option>Out for Delivery</option>
 <option>Delivered</option>
 </select>
-
-<button onClick={()=>{
-reduceStock(order);
-}}>
-Confirm Order
-</button>
 
 <div style={{marginTop:"15px"}}>
 
