@@ -1,187 +1,159 @@
-'use client';
+'use client'
 
-import { useEffect, useState } from "react";
-import { db } from "@/lib/firebase";
-import { 
-collection,
-getDocs,
-doc,
-updateDoc,
-getDoc
-} from "firebase/firestore";
+import { useEffect, useState } from 'react'
+import { subscribeOrders, updateOrderStatus, deleteOrder, Order, OrderStatus } from '@/lib/orderService'
+import { Search, ChevronDown, Eye, Trash2, Loader2 } from 'lucide-react'
 
-// Add at the top of the file, after imports
-type OrderItem = {
-  id: string;
-  name: string;
-  size: string;
-  price: number;
-};
-
-type Order = {
-  id: string;
-  total: number;
-  status: string;
-  items: OrderItem[];
-};
-
-// Then update state:
-const [orders, setOrders] = useState<Order[]>([]);
-
-async function reduceStock(order:any){
-
-for(const item of order.items){
-
-const ref = doc(db,"products",item.id);
-const snap = await getDoc(ref);
-
-if(!snap.exists()) continue;
-
-const data = snap.data();
-
-const sizes = {...data.sizes};
-
-sizes[item.size] -= 1;
-
-await updateDoc(ref,{sizes});
-
+const statusStyle: Record<OrderStatus, { bg: string; color: string }> = {
+  pending:    { bg: 'rgba(234,179,8,0.12)',  color: '#eab308' },
+  processing: { bg: 'rgba(59,130,246,0.12)', color: '#60a5fa' },
+  shipped:    { bg: 'rgba(168,85,247,0.12)', color: '#c084fc' },
+  delivered:  { bg: 'rgba(34,197,94,0.12)',  color: '#4ade80' },
+  cancelled:  { bg: 'rgba(232,22,42,0.12)',  color: '#f87171' },
 }
 
-}
+export default function OrdersPage() {
+  const [orders, setOrders] = useState<Order[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [filter, setFilter] = useState('all')
+  const [expanded, setExpanded] = useState<string | null>(null)
+  const [updating, setUpdating] = useState<string | null>(null)
 
-export default function OrdersPage(){
+  useEffect(() => {
+    const unsub = subscribeOrders((data) => {
+      setOrders(data)
+      setLoading(false)
+    })
+    return () => unsub()
+  }, [])
 
-const [orders,setOrders] = useState<any[]>([]);
+  const filtered = orders.filter(o => {
+    const match = o.customer.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase())
+    return match && (filter === 'all' || o.status === filter)
+  })
 
-useEffect(()=>{
+  const handleStatus = async (id: string, status: OrderStatus) => {
+    setUpdating(id)
+    await updateOrderStatus(id, status)
+    setUpdating(null)
+  }
 
-async function fetchOrders(){
+  const handleDelete = async (id: string) => {
+    if (confirm('Delete this order?')) await deleteOrder(id)
+  }
 
-const snapshot = await getDocs(collection(db,"orders"));
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <div>
+          <h1 className="font-display" style={{ fontSize: 32, fontWeight: 900, textTransform: 'uppercase', color: '#f5f5f5' }}>Orders</h1>
+          <p style={{ color: 'rgba(245,245,245,0.3)', fontSize: 13, marginTop: 4 }}>
+            {loading ? 'Loading...' : `${orders.length} total · ₹${orders.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+o.total,0).toLocaleString()} revenue`}
+            <span style={{ color: '#e8162a', marginLeft: 8 }}>● live</span>
+          </p>
+        </div>
+        {loading && <Loader2 size={18} color="#e8162a" />}
+      </div>
 
-const list = snapshot.docs.map(doc=>({
-id:doc.id,
-...doc.data()
-}));
+      {/* Filter tabs */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+        {['all','pending','processing','shipped','delivered','cancelled'].map(s => (
+          <button key={s} onClick={() => setFilter(s)}
+            style={{ padding: '8px 16px', fontSize: 11, fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', background: filter === s ? '#e8162a' : 'rgba(255,255,255,0.05)', color: filter === s ? '#fff' : 'rgba(245,245,245,0.4)', border: 'none', cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', boxShadow: filter === s ? '0 0 16px rgba(232,22,42,0.3)' : 'none' }}>
+            {s} {s !== 'all' && `(${orders.filter(o => o.status === s).length})`}
+          </button>
+        ))}
+      </div>
 
-setOrders(list);
-}
+      {/* Search */}
+      <div style={{ position: 'relative' }}>
+        <Search size={14} color="rgba(245,245,245,0.2)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer name or order ID..."
+          style={{ width: '100%', background: '#111', border: '1px solid rgba(255,255,255,0.07)', padding: '13px 16px 13px 42px', fontSize: 13, color: '#f5f5f5', outline: 'none', boxSizing: 'border-box' }} />
+      </div>
 
-fetchOrders();
+      {/* Table */}
+      <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '12px 24px', borderBottom: '1px solid rgba(255,255,255,0.05)', display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr 1.8fr', gap: 12 }}>
+          {['Club / Customer','Order ID','Date','Status','Total','Actions'].map(h => (
+            <span key={h} style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.2)' }}>{h}</span>
+          ))}
+        </div>
 
-},[]);
+        {loading ? (
+          <div style={{ padding: 48, textAlign: 'center', color: 'rgba(245,245,245,0.3)', fontSize: 13 }}>Connecting to Firebase...</div>
+        ) : filtered.length === 0 ? (
+          <div style={{ padding: 48, textAlign: 'center' }}>
+            <p style={{ color: 'rgba(245,245,245,0.3)', fontSize: 14, marginBottom: 8 }}>No orders found</p>
+            <p style={{ color: 'rgba(245,245,245,0.15)', fontSize: 12 }}>Orders placed from the store will appear here instantly</p>
+          </div>
+        ) : filtered.map((o, i) => {
+          const s = statusStyle[o.status]
+          return (
+            <div key={o.id}>
+              <div style={{ padding: '14px 24px', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'grid', gridTemplateColumns: '2fr 1.2fr 1fr 1fr 1fr 1.8fr', gap: 12, alignItems: 'center' }}>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: '#f5f5f5' }}>{o.customer}</p>
+                  <p style={{ fontSize: 11, color: 'rgba(245,245,245,0.25)', marginTop: 2 }}>{o.phone} · {o.city}</p>
+                </div>
+                <p style={{ fontSize: 11, fontFamily: 'monospace', color: 'rgba(245,245,245,0.35)' }}>{o.id.slice(0,14)}…</p>
+                <p style={{ fontSize: 12, color: 'rgba(245,245,245,0.4)' }}>{o.date}</p>
+                <span style={{ background: s.bg, color: s.color, fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', padding: '4px 10px', fontWeight: 700, display: 'inline-block', border: `1px solid ${s.color}33` }}>{o.status}</span>
+                <p style={{ fontSize: 14, fontWeight: 800, color: '#f5f5f5' }}>₹{o.total.toLocaleString()}</p>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  {/* Status dropdown */}
+                  <div style={{ position: 'relative' }}>
+                    <select value={o.status} onChange={e => handleStatus(o.id, e.target.value as OrderStatus)}
+                      disabled={updating === o.id}
+                      style={{ appearance: 'none', background: 'rgba(255,255,255,0.05)', color: 'rgba(245,245,245,0.6)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '7px 28px 7px 10px', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', outline: 'none', fontFamily: 'Barlow Condensed, sans-serif', opacity: updating === o.id ? 0.5 : 1 }}>
+                      {['pending','processing','shipped','delivered','cancelled'].map(st => (
+                        <option key={st} value={st} style={{ background: '#111' }}>{st}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={10} color="rgba(245,245,245,0.3)" style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
+                  </div>
+                  {/* Expand */}
+                  <button onClick={() => setExpanded(expanded === o.id ? null : o.id)}
+                    style={{ padding: 7, background: expanded === o.id ? 'rgba(232,22,42,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${expanded === o.id ? 'rgba(232,22,42,0.3)' : 'rgba(255,255,255,0.07)'}`, cursor: 'pointer', display: 'flex' }}>
+                    <Eye size={13} color={expanded === o.id ? '#e8162a' : 'rgba(245,245,245,0.4)'} />
+                  </button>
+                  {/* Delete */}
+                  <button onClick={() => handleDelete(o.id)}
+                    style={{ padding: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer', display: 'flex' }}>
+                    <Trash2 size={13} color="rgba(245,245,245,0.3)" />
+                  </button>
+                </div>
+              </div>
 
-async function reduceStock(order:any){
-
-for(const item of order.items){
-
-const productRef = doc(db,"products",item.id);
-
-const snap = await getDoc(productRef);
-
-if(!snap.exists()) continue;
-
-const product = snap.data();
-
-const updatedSizes = {
-...product.sizes,
-[item.size]: Math.max(0, (product.sizes?.[item.size] || 0) - 1)
-};
-
-await updateDoc(productRef,{
-sizes: updatedSizes
-});
-
-}
-}
-
-/* 🔥 CHANGE STATUS */
-
-async function changeStatus(order: Order, status: string){
-
-if(status === "Confirmed"){
-await reduceStock(order);
-}
-
-await updateDoc(doc(db,"orders",order.id),{
-status
-});
-
-setOrders(prev =>
-prev.map(o =>
-o.id === order.id ? {...o,status} : o
-));
-
-}
-
-return(
-
-<div>
-
-<h1 style={{
-    marginBottom:"30px",
-    marginTop:"80px"
-}}>
-Orders
-</h1>
-
-{orders.map(order=>(
-
-<div key={order.id}
-style={{
-background:"radial-gradient(circle at top,#111217,#050507)",
-border:"1px solid rgba(34,197,94,.15)",
-boxShadow:"0 20px 60px rgba(0,0,0,.6)",
-padding:"20px",
-borderRadius:"14px",
-marginBottom:"20px"
-}}
->
-
-<h3>₹{order.total}</h3>
-
-<p>Status: 
-<span style={{
-color:
-order.status === "Delivered"
-? "#22c55e"
-: order.status === "Shipped"
-? "#60a5fa"
-: "#facc15"
-}}>
-</span>
-</p>
-
-<select
-value={order.status}
-onChange={(e)=>changeStatus(order,e.target.value)}
-style={{
-padding:"8px",
-borderRadius:"6px",
-marginTop:"10px"
-}}
->
-<option>Confirmed</option>
-<option>Processing</option>
-<option>Shipped</option>
-<option>Out for Delivery</option>
-<option>Delivered</option>
-</select>
-
-<div style={{marginTop:"15px"}}>
-
-{order.items.map((item:any)=>(
-<p key={item.name}>
-• {item.name} — Size {item.size}
-</p>
-))}
-
-</div>
-
-</div>
-
-))}
-
-</div>
-);
+              {expanded === o.id && (
+                <div style={{ padding: '16px 24px 20px', background: 'rgba(232,22,42,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 20, marginBottom: o.items?.length ? 16 : 0 }}>
+                    {[['Customer', o.customer], ['Phone', o.phone], ['Email', o.email], ['Address', o.address]].map(([k, v]) => (
+                      <div key={k}>
+                        <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.2)', marginBottom: 4 }}>{k}</p>
+                        <p style={{ fontSize: 12, color: '#f5f5f5' }}>{v || '—'}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {o.items?.length > 0 && (
+                    <div>
+                      <p style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(245,245,245,0.2)', marginBottom: 8 }}>Items ({o.itemCount})</p>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        {o.items.map((item, idx) => (
+                          <span key={idx} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', padding: '5px 12px', fontSize: 12, color: 'rgba(245,245,245,0.6)' }}>
+                            {item.productName} × {item.quantity} {item.selectedSize ? `(${item.selectedSize})` : ''}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
