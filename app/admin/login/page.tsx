@@ -18,7 +18,7 @@ export default function AdminLoginPage() {
     setLoading(true)
     setError('')
     setTimeout(() => {
-      if (form.email === 'admin@gssports.com' && form.password === 'gssports2025') {
+      if (form.email.trim() === 'gssports@admin.com' && form.password.trim() === 'Gssportspune') {
         localStorage.setItem('gs_admin', 'true')
         router.push('/admin')
       } else {
@@ -77,9 +77,7 @@ export default function AdminLoginPage() {
 
           <p style={{ fontSize: 11, color: 'rgba(245,245,245,0.2)', textAlign: 'center', marginTop: 24 }}>Restricted to GS Sports admin staff only.</p>
         </div>
-        {process.env.NODE_ENV !== 'production' && (
-          <p style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(245,245,245,0.15)' }}>Hint: admin@gssports.com / gssports2025</p>
-        )}
+        <p style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(245,245,245,0.15)' }}>GS Sports Pune · Admin Only</p>
       </div>
     </div>
   )
