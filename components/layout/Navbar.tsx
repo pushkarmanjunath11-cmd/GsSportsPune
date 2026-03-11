@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { ShoppingBag, Menu, X, Phone } from 'lucide-react'
 import { useCartStore } from '@/lib/store'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 const links = [
   { href: '/shop', label: 'Shop' },
@@ -17,12 +17,27 @@ export function Navbar() {
   const count = itemCount()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const menuButtonRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', h)
     return () => window.removeEventListener('scroll', h)
   }, [])
+
+  useEffect(() => {
+    if (!mobileOpen) return
+    
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileOpen(false)
+        menuButtonRef.current?.focus()
+      }
+    }
+    
+    window.addEventListener('keydown', handleEscape)
+    return () => window.removeEventListener('keydown', handleEscape)
+  }, [mobileOpen])
 
   return (
     <>
@@ -54,7 +69,7 @@ export function Navbar() {
               +91 98765 43210
             </a>
 
-            <button onClick={toggleCart} className="relative text-white/70 hover:text-white transition-colors">
+            <button onClick={toggleCart} aria-label={`Open cart${count > 0 ? ` with ${count} ${count === 1 ? 'item' : 'items'}` : ''}`} className="relative text-white/70 hover:text-white transition-colors">
               <ShoppingBag size={20} strokeWidth={1.5} />
               {count > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -63,7 +78,7 @@ export function Navbar() {
               )}
             </button>
 
-            <button className="lg:hidden text-white/70" onClick={() => setMobileOpen(true)}>
+            <button className="lg:hidden text-white/70" onClick={() => setMobileOpen(true)} aria-label="Open mobile menu" ref={menuButtonRef}>
               <Menu size={22} strokeWidth={1.5} />
             </button>
           </div>
@@ -71,13 +86,13 @@ export function Navbar() {
       </header>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 bg-[#080808] flex flex-col p-8">
+        <div className="fixed inset-0 z-50 bg-[#080808] flex flex-col p-8" role="dialog" aria-modal="true" aria-label="Mobile navigation menu">
           <div className="flex justify-between items-center mb-12">
             <Link href="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
               <div className="w-9 h-9 bg-red-500 flex items-center justify-center font-display font-900 text-white text-lg">GS</div>
               <p className="font-display font-800 text-white text-xl tracking-wide uppercase">GS Sports</p>
             </Link>
-            <button onClick={() => setMobileOpen(false)} className="text-white/50"><X size={24} /></button>
+            <button onClick={() => setMobileOpen(false)} aria-label="Close menu" className="text-white/50"><X size={24} /></button>
           </div>
           <nav className="flex flex-col gap-6">
             {links.map((l) => (

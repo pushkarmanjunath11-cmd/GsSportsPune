@@ -15,18 +15,34 @@ const statusStyle: Record<OrderStatus, { bg: string; color: string }> = {
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
   const [expanded, setExpanded] = useState<string | null>(null)
   const [updating, setUpdating] = useState<string | null>(null)
 
   useEffect(() => {
-    const unsub = subscribeOrders((data) => {
-      setOrders(data)
+    const unsub = subscribeOrders((data, err) => {
+      if (err) {
+        setError(err.message)
+        console.error('Failed to load orders:', err)
+      } else if (data) {
+        setOrders(data)
+        setError(null)
+      }
       setLoading(false)
     })
     return () => unsub()
   }, [])
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center py-8">
+        <p className="font-semibold">Failed to load orders</p>
+        <p className="text-sm mt-2">{error}</p>
+      </div>
+    )
+  }
 
   const filtered = orders.filter(o => {
     const match = o.customer.toLowerCase().includes(search.toLowerCase()) || o.id.toLowerCase().includes(search.toLowerCase())
@@ -35,12 +51,25 @@ export default function OrdersPage() {
 
   const handleStatus = async (id: string, status: OrderStatus) => {
     setUpdating(id)
-    await updateOrderStatus(id, status)
-    setUpdating(null)
+    try {
+      await updateOrderStatus(id, status)
+    } catch (e: any) {
+      console.error('Failed to update order status:', e)
+      alert(`Error updating status: ${e?.message || 'Unknown error'}`)
+    } finally {
+      setUpdating(null)
+    }
   }
 
   const handleDelete = async (id: string) => {
-    if (confirm('Delete this order?')) await deleteOrder(id)
+    if (confirm('Delete this order?')) {
+      try {
+        await deleteOrder(id)
+      } catch (e: any) {
+        console.error('Failed to delete order:', e)
+        alert(`Error deleting order: ${e?.message || 'Unknown error'}`)
+      }
+    }
   }
 
   return (
@@ -69,7 +98,7 @@ export default function OrdersPage() {
       {/* Search */}
       <div style={{ position: 'relative' }}>
         <Search size={14} color="rgba(245,245,245,0.2)" style={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)' }} />
-        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer name or order ID..."
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by customer name or order ID..." aria-label="Search orders by customer name or order ID"
           style={{ width: '100%', background: '#111', border: '1px solid rgba(255,255,255,0.07)', padding: '13px 16px 13px 42px', fontSize: 13, color: '#f5f5f5', outline: 'none', boxSizing: 'border-box' }} />
       </div>
 
@@ -104,7 +133,7 @@ export default function OrdersPage() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   {/* Status dropdown */}
                   <div style={{ position: 'relative' }}>
-                    <select value={o.status} onChange={e => handleStatus(o.id, e.target.value as OrderStatus)}
+                    <select value={o.status} onChange={e => handleStatus(o.id, e.target.value as OrderStatus)} aria-label={`Order status for order ${o.id}`}
                       disabled={updating === o.id}
                       style={{ appearance: 'none', background: 'rgba(255,255,255,0.05)', color: 'rgba(245,245,245,0.6)', fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '7px 28px 7px 10px', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer', outline: 'none', fontFamily: 'Barlow Condensed, sans-serif', opacity: updating === o.id ? 0.5 : 1 }}>
                       {['pending','processing','shipped','delivered','cancelled'].map(st => (
@@ -114,12 +143,12 @@ export default function OrdersPage() {
                     <ChevronDown size={10} color="rgba(245,245,245,0.3)" style={{ position: 'absolute', right: 6, top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none' }} />
                   </div>
                   {/* Expand */}
-                  <button onClick={() => setExpanded(expanded === o.id ? null : o.id)}
+                  <button onClick={() => setExpanded(expanded === o.id ? null : o.id)} aria-label={`${expanded === o.id ? 'Collapse' : 'View'} order ${o.id}`}
                     style={{ padding: 7, background: expanded === o.id ? 'rgba(232,22,42,0.15)' : 'rgba(255,255,255,0.05)', border: `1px solid ${expanded === o.id ? 'rgba(232,22,42,0.3)' : 'rgba(255,255,255,0.07)'}`, cursor: 'pointer', display: 'flex' }}>
                     <Eye size={13} color={expanded === o.id ? '#e8162a' : 'rgba(245,245,245,0.4)'} />
                   </button>
                   {/* Delete */}
-                  <button onClick={() => handleDelete(o.id)}
+                  <button onClick={() => handleDelete(o.id)} aria-label={`Delete order ${o.id}`}
                     style={{ padding: 7, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer', display: 'flex' }}>
                     <Trash2 size={13} color="rgba(245,245,245,0.3)" />
                   </button>

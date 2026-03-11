@@ -53,7 +53,7 @@ export default function ShopPage() {
             <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
               className={`p-5 border-2 transition-all text-left ${activeCategory === cat.id ? `${categoryColors[cat.id]} text-white border-transparent` : 'border-white/10 hover:border-white/30'}`}>
               <span className="text-3xl block mb-3">{cat.icon}</span>
-              <p className={`font-display font-800 uppercase text-lg ${activeCategory === cat.id ? 'text-white' : 'text-white'}`}>{cat.name}</p>
+              <p className="font-display font-800 uppercase text-lg text-white">{cat.name}</p>
               <p className={`text-xs mt-1 ${activeCategory === cat.id ? 'text-white/70' : 'text-white/40'}`}>
                 {products.filter(p => p.category === cat.id).length} items
               </p>
@@ -73,7 +73,7 @@ export default function ShopPage() {
             )}
             <p className="text-white/30 text-sm">{filtered.length} products</p>
           </div>
-          <select value={sort} onChange={(e) => setSort(e.target.value)}
+          <select value={sort} onChange={(e) => setSort(e.target.value)} aria-label="Sort products"
             className="bg-[#111] border border-white/10 text-white/50 text-xs tracking-widest uppercase px-4 py-2 focus:outline-none focus:border-red-500/50">
             <option value="">Sort: Default</option>
             <option value="price-asc">Price: Low–High</option>

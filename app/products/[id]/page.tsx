@@ -13,6 +13,10 @@ export async function generateStaticParams() {
 export default function ProductPage({ params }: { params: { id: string } }) {
   const product = getById(params.id)
   if (!product) notFound()
+  
+  // Guard against missing images
+  const productImage = product.images?.[0] || '/images/placeholder.png'
+  
   const related = products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
 
   return (
@@ -21,7 +25,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
           {/* Image */}
           <div className="relative aspect-square bg-[#111] border border-white/5 overflow-hidden">
-            <Image src={product.images[0]} alt={product.name} fill className="object-cover opacity-80" priority />
+            <Image src={productImage} alt={product.name} fill className="object-cover opacity-80" priority />
             <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/60 to-transparent" />
             {product.isNew && (
               <div className="absolute top-5 left-5 bg-red-500 text-white text-xs tracking-widest uppercase px-3 py-1.5 font-bold">New</div>

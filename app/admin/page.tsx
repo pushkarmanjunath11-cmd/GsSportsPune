@@ -18,8 +18,15 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const unsub = subscribeOrders((data) => {
-      setOrders(data)
+    const unsub = subscribeOrders((orders, error) => {
+      if (error) {
+        console.error('Failed to load orders:', error)
+        setLoading(false)
+        return
+      }
+      if (orders) {
+        setOrders(orders)
+      }
       setLoading(false)
     })
     return () => unsub()
@@ -100,7 +107,7 @@ export default function AdminDashboard() {
         ) : (
           <div>
             {recentOrders.map((o, i) => {
-              const s = statusStyle[o.status]
+              const s = statusStyle[o.status] ?? { bg: 'rgba(255,255,255,0.05)', color: 'rgba(245,245,245,0.4)' }
               return (
                 <div key={o.id} style={{ padding: '14px 24px', borderBottom: i < recentOrders.length - 1 ? '1px solid rgba(255,255,255,0.04)' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
                   <div>

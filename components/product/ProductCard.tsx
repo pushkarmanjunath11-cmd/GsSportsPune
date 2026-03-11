@@ -6,12 +6,14 @@ import { Product } from '@/types'
 import { Star, Package } from 'lucide-react'
 
 export function ProductCard({ product }: { product: Product }) {
+  const imageUrl = product.images?.[0] || '/images/placeholder.png'
+  
   return (
     <Link href={`/products/${product.id}`} className="group block bg-[#111] border border-white/5 hover:border-red-500/30 transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-square overflow-hidden bg-[#1a1a1a]">
         <Image
-          src={product.images[0]}
+          src={imageUrl}
           alt={product.name}
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-110 opacity-80 group-hover:opacity-100"
@@ -39,7 +41,7 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Info */}
       <div className="p-4">
         <p className="text-[9px] text-red-500 tracking-widest uppercase font-semibold mb-1">{product.category}</p>
-        <h3 className="font-display font-700 text-white uppercase text-lg leading-tight group-hover:text-red-400 transition-colors mb-2">
+        <h3 className="font-display font-bold text-white uppercase text-lg leading-tight group-hover:text-red-400 transition-colors mb-2">
           {product.name}
         </h3>
         <p className="text-white/40 text-xs leading-relaxed mb-3 line-clamp-2">{product.description}</p>

@@ -10,6 +10,7 @@ const colorOptions = ['#e8162a', '#1a56db', '#047857', '#d97706', '#7c3aed', '#0
 export default function CustomizePage() {
   const [step, setStep] = useState(1)
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
   const [form, setForm] = useState({
     kitType: 'Match Jersey',
     sport: 'Football',
@@ -28,6 +29,34 @@ export default function CustomizePage() {
   })
 
   const update = (key: string, val: string | boolean) => setForm(prev => ({ ...prev, [key]: val }))
+
+  const handleSubmit = async () => {
+    // Client-side validation
+    if (!form.contactName.trim() || !form.contactPhone.trim()) {
+      alert('Please fill in your name and phone number')
+      return
+    }
+    
+    setSubmitting(true)
+    try {
+      const response = await fetch('/api/submitCustomization', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
+      
+      if (!response.ok) {
+        const error = await response.text()
+        throw new Error(error || 'Failed to submit customization request')
+      }
+      
+      setSubmitted(true)
+    } catch (error: any) {
+      alert(`Error: ${error?.message || 'Failed to submit request'}`)
+    } finally {
+      setSubmitting(false)
+    }
+  }
 
   const inputClass = "w-full bg-[#111] border border-white/8 px-4 py-3.5 text-sm text-white placeholder-white/20 focus:outline-none focus:border-red-500/50 transition-colors"
   const labelClass = "block text-[10px] tracking-widest uppercase text-white/35 font-semibold mb-2"
@@ -114,8 +143,11 @@ export default function CustomizePage() {
                 </div>
                 <div>
                   <label className={labelClass}>Quantity (pieces)</label>
-                  <input value={form.qty} onChange={e => update('qty', e.target.value)}
-                    type="number" min="10" placeholder="Min 10 pieces" className={inputClass} />
+                  <input value={form.qty} onChange={e => {
+                    const parsed = parseInt(e.target.value || '0', 10) || 10
+                    update('qty', String(Math.max(10, parsed)))
+                  }}
+                    type="number" min="10" id="qty" placeholder="Min 10 pieces" className={inputClass} />
                   <p className="text-xs text-white/25 mt-1.5">Minimum order is 10 pieces</p>
                 </div>
                 <div>
@@ -140,7 +172,7 @@ export default function CustomizePage() {
                 <label className={labelClass}>Primary Color</label>
                 <div className="flex flex-wrap gap-3">
                   {colorOptions.map((c) => (
-                    <button key={c} onClick={() => update('primaryColor', c)}
+                    <button key={c} onClick={() => update('primaryColor', c)} aria-label={`Select primary color ${c}`}
                       className={`w-10 h-10 border-2 transition-all ${form.primaryColor === c ? 'border-white scale-110' : 'border-transparent'}`}
                       style={{ background: c }} />
                   ))}
@@ -152,7 +184,7 @@ export default function CustomizePage() {
                 <label className={labelClass}>Secondary Color</label>
                 <div className="flex flex-wrap gap-3">
                   {colorOptions.map((c) => (
-                    <button key={c} onClick={() => update('secondaryColor', c)}
+                    <button key={c} onClick={() => update('secondaryColor', c)} aria-label={`Select secondary color ${c}`}
                       className={`w-10 h-10 border-2 transition-all ${form.secondaryColor === c ? 'border-white scale-110' : 'border-transparent'}`}
                       style={{ background: c }} />
                   ))}
@@ -241,9 +273,9 @@ export default function CustomizePage() {
 
             <div className="flex gap-4">
               <button onClick={() => setStep(2)} className="border border-white/10 text-white/40 px-6 py-4 text-xs tracking-widest uppercase hover:border-white/30 transition-all">← Back</button>
-              <button onClick={() => setSubmitted(true)}
-                className="flex-1 inline-flex items-center justify-center gap-3 bg-red-500 text-white px-8 py-4 font-display font-700 text-sm tracking-widest uppercase hover:bg-red-600 transition-all glow-red">
-                <Zap size={15} /> Submit Request
+              <button onClick={handleSubmit} disabled={submitting}
+                className="flex-1 inline-flex items-center justify-center gap-3 bg-red-500 text-white px-8 py-4 font-display font-700 text-sm tracking-widest uppercase hover:bg-red-600 transition-all glow-red disabled:bg-gray-600 disabled:cursor-not-allowed">
+                <Zap size={15} /> {submitting ? 'Submitting...' : 'Submit Request'}
               </button>
             </div>
           </div>

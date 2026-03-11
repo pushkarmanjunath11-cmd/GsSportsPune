@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, Suspense } from 'react'
+import { useRef, Suspense, useMemo } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { Sphere, MeshDistortMaterial, Float, Stars } from '@react-three/drei'
 import * as THREE from 'three'
@@ -50,12 +50,15 @@ function ParticleField() {
   })
 
   const count = 800
-  const positions = new Float32Array(count * 3)
-  for (let i = 0; i < count; i++) {
-    positions[i * 3] = (Math.random() - 0.5) * 20
-    positions[i * 3 + 1] = (Math.random() - 0.5) * 20
-    positions[i * 3 + 2] = (Math.random() - 0.5) * 20
-  }
+  const positions = useMemo(() => {
+    const pos = new Float32Array(count * 3)
+    for (let i = 0; i < count; i++) {
+      pos[i * 3] = (Math.random() - 0.5) * 20
+      pos[i * 3 + 1] = (Math.random() - 0.5) * 20
+      pos[i * 3 + 2] = (Math.random() - 0.5) * 20
+    }
+    return pos
+  }, [count])
 
   return (
     <points ref={points}>

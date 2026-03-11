@@ -7,15 +7,24 @@ import { Check, ShoppingBag } from 'lucide-react'
 
 export function AddToCartButton({ product }: { product: Product }) {
   const { addItem, openCart } = useCartStore()
-  const [size, setSize] = useState(product.sizes[0])
+  const [size, setSize] = useState<string | null>(product.sizes?.length ? product.sizes[0] : null)
   const [qty, setQty] = useState(product.moq ?? 1)
   const [added, setAdded] = useState(false)
 
   const handle = () => {
+    if (!size) return
     addItem(product, qty, size)
     setAdded(true)
     openCart()
     setTimeout(() => setAdded(false), 2000)
+  }
+
+  if (!product.sizes?.length) {
+    return (
+      <div className="space-y-5">
+        <p className="text-xs text-white/40">No sizes available</p>
+      </div>
+    )
   }
 
   return (
@@ -53,8 +62,8 @@ export function AddToCartButton({ product }: { product: Product }) {
       </div>
 
       {/* Button */}
-      <button onClick={handle} disabled={!product.inStock}
-        className={`w-full py-4 text-sm tracking-widest uppercase font-display font-700 flex items-center justify-center gap-3 transition-all ${
+      <button onClick={handle} disabled={!product.inStock || !size}
+        className={`w-full py-4 text-sm tracking-widest uppercase font-display font-bold flex items-center justify-center gap-3 transition-all ${
           !product.inStock ? 'bg-white/10 text-white/30 cursor-not-allowed'
           : added ? 'bg-green-600 text-white'
           : 'bg-red-500 text-white hover:bg-red-600 glow-red'

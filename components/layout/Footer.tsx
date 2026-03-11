@@ -18,7 +18,7 @@ export function Footer() {
               Pune's premier custom sports kit manufacturer. Sublimation printing, name & number customization, bulk orders for clubs and academies.
             </p>
             <div className="flex gap-4">
-              <a href="https://instagram.com/gssports_punee" target="_blank" rel="noopener noreferrer"
+              <a href="https://instagram.com/gssports_punee" target="_blank" rel="noopener noreferrer" aria-label="Visit GSSports Pune on Instagram"
                 className="w-9 h-9 border border-white/10 flex items-center justify-center text-white/40 hover:border-red-500 hover:text-red-500 transition-all">
                 <Instagram size={16} />
               </a>
@@ -28,10 +28,16 @@ export function Footer() {
           <div>
             <p className="text-[10px] tracking-widest uppercase text-white/30 mb-5 font-semibold">Quick Links</p>
             <ul className="space-y-3 text-sm">
-              {['Shop All', 'Custom Kits', 'Full Kits', 'Jerseys', 'Tracksuits'].map((item) => (
-                <li key={item}>
-                  <Link href="/shop" className="text-white/50 hover:text-red-500 transition-colors font-display uppercase tracking-wide text-xs font-600">
-                    {item}
+              {[
+                { label: 'Shop All', href: '/shop' },
+                { label: 'Custom Kits', href: '/customize' },
+                { label: 'Full Kits', href: '#' },
+                { label: 'Jerseys', href: '/shop' },
+                { label: 'Tracksuits', href: '#' }
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-white/50 hover:text-red-500 transition-colors font-display uppercase tracking-wide text-xs font-600">
+                    {item.label}
                   </Link>
                 </li>
               ))}

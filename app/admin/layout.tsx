@@ -16,16 +16,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const router = useRouter()
   const [authed, setAuthed] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
   useEffect(() => {
-    if (pathname === '/admin/login') { setAuthed(true); return }
+    // On login page, skip auth check
+    if (pathname === '/admin/login') {
+      setCheckingAuth(false)
+      return
+    }
+
+    // Check for secure session (in production, use middleware/server-side validation)
+    // For now, check localStorage but should be replaced with secure HTTP-only cookie check
     const ok = localStorage.getItem('gs_admin')
-    if (!ok) { router.push('/admin/login'); return }
+    if (!ok) {
+      router.push('/admin/login')
+      return
+    }
     setAuthed(true)
+    setCheckingAuth(false)
   }, [pathname, router])
 
   if (pathname === '/admin/login') return <>{children}</>
-  if (!authed) return <div style={{ background: '#080808', minHeight: '100vh' }} />
+  if (checkingAuth || !authed) return <div style={{ background: '#080808', minHeight: '100vh' }} />
 
   const logout = () => {
     localStorage.removeItem('gs_admin')

@@ -77,7 +77,9 @@ export default function AdminLoginPage() {
 
           <p style={{ fontSize: 11, color: 'rgba(245,245,245,0.2)', textAlign: 'center', marginTop: 24 }}>Restricted to GS Sports admin staff only.</p>
         </div>
-        <p style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(245,245,245,0.15)' }}>Hint: admin@gssports.com / gssports2025</p>
+        {process.env.NODE_ENV !== 'production' && (
+          <p style={{ textAlign: 'center', marginTop: 16, fontSize: 11, color: 'rgba(245,245,245,0.15)' }}>Hint: admin@gssports.com / gssports2025</p>
+        )}
       </div>
     </div>
   )

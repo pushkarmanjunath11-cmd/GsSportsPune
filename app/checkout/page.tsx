@@ -16,6 +16,7 @@ export default function CheckoutPage() {
   const { items, total, clearCart } = useCartStore()
   const [step, setStep] = useState<Step>('contact')
   const [orderId, setOrderId] = useState('')
+  const [finalTotal, setFinalTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
   const [form, setForm] = useState({ name: '', email: '', phone: '', address: '', city: 'Pune', state: 'Maharashtra', zip: '' })
@@ -27,6 +28,7 @@ export default function CheckoutPage() {
     setErrorMsg('')
     try {
       console.log('📦 Placing order with items:', items.length)
+      const final = cartTotal
       const id = await placeOrder({
         customer: form.name,
         email: form.email || '',
@@ -34,10 +36,11 @@ export default function CheckoutPage() {
         city: form.city,
         address: `${form.address}, ${form.city}, ${form.state} - ${form.zip}`,
         items,
-        total: cartTotal,
+        total: final,
         itemCount: items.reduce((s, i) => s + i.quantity, 0),
       })
       console.log('✅ Order placed successfully:', id)
+      setFinalTotal(final)
       setOrderId(id)
       clearCart()
       setStep('done')
@@ -78,7 +81,7 @@ export default function CheckoutPage() {
           </p>
           <div style={{ background: '#111', border: '1px solid rgba(255,255,255,0.06)', padding: 20, marginBottom: 28, textAlign: 'left', position: 'relative' }}>
             <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 3, background: '#e8162a' }} />
-            {[['Customer', form.name], ['Phone', form.phone], ['City', form.city], ['Total', `₹${cartTotal.toLocaleString()}`]].map(([k, v]) => (
+            {[['Customer', form.name], ['Phone', form.phone], ['City', form.city], ['Total', `₹${finalTotal.toLocaleString()}`]].map(([k, v]) => (
               <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid rgba(255,255,255,0.04)', fontSize: 13 }}>
                 <span style={{ color: 'rgba(245,245,245,0.35)' }}>{k}</span>
                 <span style={{ color: '#f5f5f5', fontWeight: 700 }}>{v}</span>
@@ -188,9 +191,9 @@ export default function CheckoutPage() {
             <h3 className="font-display" style={{ fontSize: 16, fontWeight: 800, textTransform: 'uppercase', color: '#f5f5f5', letterSpacing: '0.1em', marginBottom: 20 }}>Your Order</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 14, marginBottom: 20 }}>
               {items.map((item) => (
-                <div key={item.product.id} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                <div key={`${item.product.id}-${item.selectedSize}`} style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
                   <div style={{ width: 48, height: 48, background: '#1a1a1a', position: 'relative', flexShrink: 0 }}>
-                    <Image src={item.product.images[0]} alt={item.product.name} fill style={{ objectFit: 'cover', opacity: 0.8 }} />
+                    <Image src={item.product.images?.[0] || '/images/placeholder.png'} alt={item.product.name} fill style={{ objectFit: 'cover', opacity: 0.8 }} />
                     <span style={{ position: 'absolute', top: -6, right: -6, width: 18, height: 18, background: '#e8162a', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 800, color: '#fff' }}>{item.quantity}</span>
                   </div>
                   <div style={{ flex: 1 }}>

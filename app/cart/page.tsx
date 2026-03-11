@@ -32,9 +32,9 @@ export default function CartPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-6">
             {items.map((item) => (
-              <div key={item.product.id} className="flex gap-5 pb-6 border-b border-white/5">
+              <div key={`${item.product.id}-${item.selectedSize}`} className="flex gap-5 pb-6 border-b border-white/5">
                 <Link href={`/products/${item.product.id}`} className="w-24 h-24 bg-[#111] relative flex-shrink-0 overflow-hidden">
-                  <Image src={item.product.images[0]} alt={item.product.name} fill className="object-cover opacity-80" />
+                  <Image src={item.product.images?.[0] || '/images/placeholder.png'} alt={item.product.name} fill className="object-cover opacity-80" />
                 </Link>
                 <div className="flex-1">
                   <div className="flex justify-between items-start">
@@ -42,13 +42,13 @@ export default function CartPage() {
                       <h3 className="font-display font-700 text-white text-lg uppercase">{item.product.name}</h3>
                       {item.selectedSize && <p className="text-xs text-white/30 mt-1">Size: {item.selectedSize}</p>}
                     </div>
-                    <button onClick={() => removeItem(item.product.id)} className="text-white/20 hover:text-red-400 transition-colors"><X size={16} /></button>
+                    <button onClick={() => removeItem(item.product.id, item.selectedSize)} className="text-white/20 hover:text-red-400 transition-colors"><X size={16} /></button>
                   </div>
                   <div className="flex items-center justify-between mt-4">
                     <div className="flex items-center border border-white/10">
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} className="p-2 text-white/40 hover:text-white"><Minus size={13} /></button>
+                      <button onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1), item.selectedSize)} className="p-2 text-white/40 hover:text-white"><Minus size={13} /></button>
                       <span className="px-4 text-white text-sm">{item.quantity}</span>
-                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} className="p-2 text-white/40 hover:text-white"><Plus size={13} /></button>
+                      <button onClick={() => updateQuantity(item.product.id, item.quantity + 1, item.selectedSize)} className="p-2 text-white/40 hover:text-white"><Plus size={13} /></button>
                     </div>
                     <span className="text-white font-semibold">₹{(item.product.price * item.quantity).toLocaleString()}</span>
                   </div>

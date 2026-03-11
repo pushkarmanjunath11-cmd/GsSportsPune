@@ -87,12 +87,13 @@ export async function placeOrder(data: {
     createdAt: serverTimestamp(),
   })
 
-  console.log('📤 Sending to Firestore:', JSON.stringify(payload, null, 2))
+  // Log only non-PII identifiers for debugging
+  console.log('📤 Order placed:', { itemCount: payload.itemCount, total: payload.total, status: payload.status })
   const ref = await addDoc(collection(db, COL), payload)
   return ref.id
 }
 
-export function subscribeOrders(callback: (orders: Order[]) => void) {
+export function subscribeOrders(callback: (orders: Order[] | null, error?: Error) => void) {
   const q = query(collection(db, COL), orderBy('createdAt', 'desc'))
   return onSnapshot(q, (snap) => {
     const orders: Order[] = snap.docs.map(d => {
@@ -115,7 +116,7 @@ export function subscribeOrders(callback: (orders: Order[]) => void) {
     callback(orders)
   }, (error) => {
     console.error('Firestore error:', error)
-    callback([])
+    callback(null, error as Error)
   })
 }
 

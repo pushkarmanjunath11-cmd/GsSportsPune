@@ -6,7 +6,7 @@ import { Footer } from './Footer'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
+  const pathname = usePathname() || ''
   const isAdmin = pathname.startsWith('/admin')
 
   if (isAdmin) return <>{children}</>

@@ -77,7 +77,9 @@ export default function ProductsPage() {
                 {/* Product */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                   <div style={{ width: 44, height: 44, background: '#1a1a1a', position: 'relative', flexShrink: 0, overflow: 'hidden', borderLeft: `3px solid ${color}` }}>
-                    <Image src={p.images[0]} alt={p.name} fill style={{ objectFit: 'cover', opacity: 0.75 }} />
+                    {p.images?.[0] && (
+                      <Image src={p.images[0]} alt={p.name} fill style={{ objectFit: 'cover', opacity: 0.75 }} />
+                    )}
                   </div>
                   <div>
                     <p style={{ fontSize: 13, fontWeight: 700, color: '#f5f5f5' }}>{p.name}</p>
@@ -99,7 +101,7 @@ export default function ProductsPage() {
 
                 {/* Actions */}
                 <div style={{ display: 'flex', gap: 6 }}>
-                  <Link href="/admin/add-product">
+                  <Link href={`/admin/add-product/${p.id}`}>
                     <div style={{ padding: 7, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.07)', cursor: 'pointer', display: 'flex' }}>
                       <Pencil size={13} color="rgba(245,245,245,0.4)" />
                     </div>
